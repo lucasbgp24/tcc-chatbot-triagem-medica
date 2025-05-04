@@ -26,7 +26,11 @@ const WELCOME_MESSAGE = {
     type: 'bot'
 };
 
+// Variáveis globais para controle do chat
 let conversationHistory = [];
+let currentViewingId = null;
+let currentConversationBackup = null;
+let isViewingHistory = false;
 
 // Variáveis globais para elementos do DOM
 let chatMessages;
@@ -233,28 +237,76 @@ const SYMPTOM_EMOJIS = {
 
 // Variáveis para controle de inatividade
 let inactivityTimeout;
-const INACTIVITY_TIMEOUT = 300000; // 5 minutos em milissegundos
+const INACTIVITY_TIMEOUT = 180000; // 3 minutos em milissegundos
+
+// Palavras que indicam agradecimento
+const THANK_WORDS = ['obrigado', 'obrigada', 'agradeço', 'valeu', 'thanks', 'thank you', 'gratidão'];
 
 // Função para resetar o timer de inatividade
-function resetTimer() {
+function resetInactivityTimer() {
     clearTimeout(inactivityTimeout);
     inactivityTimeout = setTimeout(() => {
-        addMessage({
-            text: 'Você está aí? Se precisar de ajuda, estou à disposição.',
-            type: 'bot'
-        }, true);
+        const inactivityMessage = {
+            role: 'assistant',
+            content: 'Notei que você está inativo há algum tempo. Posso ajudar com mais alguma coisa? Se não, podemos finalizar o atendimento.'
+        };
+        addMessage(inactivityMessage.content, true);
+        conversationHistory.push(inactivityMessage);
+        
+        // Adiciona botões de ação
+        const actionButtons = document.createElement('div');
+        actionButtons.className = 'message-actions';
+        actionButtons.innerHTML = `
+            <button class="action-button" onclick="finishAttendanceWithSummary()">
+                <i class="fas fa-check-circle"></i>
+                Finalizar Atendimento
+            </button>
+            <button class="action-button" onclick="continueAttendance()">
+                <i class="fas fa-comments"></i>
+                Continuar Atendimento
+            </button>
+        `;
+        chatMessages.appendChild(actionButtons);
     }, INACTIVITY_TIMEOUT);
 }
 
-// Função para verificar inatividade
+// Função para iniciar verificação de inatividade
 function startInactivityCheck() {
-    // Eventos que resetam o timer
-    document.addEventListener('mousemove', resetTimer);
-    document.addEventListener('keypress', resetTimer);
-    document.addEventListener('click', resetTimer);
-    
-    // Inicia o timer
-    resetTimer();
+    resetInactivityTimer();
+}
+
+// Função para verificar se a mensagem contém agradecimento
+function containsThankWord(message) {
+    return THANK_WORDS.some(word => message.toLowerCase().includes(word));
+}
+
+// Função para finalizar atendimento com resumo e PDF
+async function finishAttendanceWithSummary() {
+    try {
+        console.log('Iniciando finalização do atendimento...');
+        // NÃO criar/adicionar o resumo automaticamente
+        // Cria e adiciona o feedback
+        let feedback;
+        try {
+            feedback = createFeedback();
+            if (!feedback) throw new Error('Feedback não gerado');
+            addMessage(feedback.outerHTML, true, true); // agora como HTML
+        } catch (e) {
+            console.error('Erro ao criar/adicionar feedback:', e);
+            showToast('Erro ao criar feedback.', 'error');
+        }
+        // Mensagem final sem mencionar PDF automático
+        const finalMessage = {
+            role: 'system',
+            content: `${SYMPTOM_EMOJIS.general} Atendimento finalizado! Caso seus sintomas se agravem ou surjam novos sintomas, não hesite em iniciar um novo atendimento ou procurar ajuda médica presencial. Números de emergência: 📞 SAMU: 192 📞 Bombeiros: 193`
+        };
+        addMessage(finalMessage.content, true);
+        // Salva o histórico final
+        await saveConversationHistory();
+    } catch (error) {
+        console.error('Erro ao finalizar atendimento (bloco principal):', error);
+        showToast('Erro ao finalizar atendimento. Por favor, tente novamente.', 'error');
+    }
 }
 
 // Variáveis globais para controle da triagem
@@ -305,27 +357,27 @@ function initializeMobileMenu() {
     console.log('Inicializando menu mobile...');
     
     if (menuMobile && menuOverlayMobile && headerButtonsMobile) {
-        // Evento de clique no botão do menu mobile
-        menuMobile.addEventListener('click', () => {
+// Evento de clique no botão do menu mobile
+menuMobile.addEventListener('click', () => {
             console.log('Menu mobile clicado');
-            headerButtonsMobile.classList.toggle('active');
-            menuOverlayMobile.classList.toggle('active');
-        });
+    headerButtonsMobile.classList.toggle('active');
+    menuOverlayMobile.classList.toggle('active');
+});
 
-        // Fecha o menu ao clicar no overlay
-        menuOverlayMobile.addEventListener('click', () => {
+// Fecha o menu ao clicar no overlay
+menuOverlayMobile.addEventListener('click', () => {
             console.log('Overlay clicado');
-            headerButtonsMobile.classList.remove('active');
-            menuOverlayMobile.classList.remove('active');
-        });
+    headerButtonsMobile.classList.remove('active');
+    menuOverlayMobile.classList.remove('active');
+});
 
         // Fecha o menu ao clicar em qualquer botão
         headerButtonsMobile.querySelectorAll('button').forEach(button => {
-            button.addEventListener('click', () => {
-                headerButtonsMobile.classList.remove('active');
-                menuOverlayMobile.classList.remove('active');
-            });
-        });
+    button.addEventListener('click', () => {
+        headerButtonsMobile.classList.remove('active');
+        menuOverlayMobile.classList.remove('active');
+    });
+});
     } else {
         console.error('Elementos do menu mobile não encontrados:', {
             menuMobile: !!menuMobile,
@@ -413,7 +465,7 @@ function formatTime(date) {
 }
 
 // Função para adicionar mensagem ao chat
-function addMessage(content, isBot = false) {
+function addMessage(content, isBot = false, isHtml = false, addToHistory = true) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${isBot ? 'bot-message' : 'user-message'}`;
     
@@ -431,11 +483,12 @@ function addMessage(content, isBot = false) {
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
     
-    // Se o conteúdo for um objeto com text e type, usa apenas o text
-    if (typeof content === 'object' && content.text) {
+    if (isHtml) {
+        contentDiv.innerHTML = content;
+    } else if (typeof content === 'object' && content.text) {
         contentDiv.textContent = content.text;
     } else {
-        contentDiv.textContent = content;
+    contentDiv.textContent = content;
     }
     
     if (isBot) {
@@ -449,15 +502,16 @@ function addMessage(content, isBot = false) {
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
     
-    // Adiciona ao histórico
+    // Adiciona ao histórico (apenas se não for HTML de componente e se addToHistory for true)
+    if (!isHtml && addToHistory) {
     conversationHistory.push({
         role: isBot ? 'assistant' : 'user',
-        content: typeof content === 'object' ? content.text : content,
+            content: typeof content === 'object' ? content.text : content,
         timestamp: new Date()
     });
-    
-    // Salva o histórico
+    // Salva o histórico apenas se for para adicionar
     saveConversationHistory();
+    }
 }
 
 // Função para verificar se deve mostrar os botões de ação
@@ -600,7 +654,7 @@ async function saveConversationHistory() {
 
         if (!conversationHistory.length) return;
 
-        const symptoms = extractSymptoms(conversationHistory);
+    const symptoms = extractSymptoms(conversationHistory);
         const duration = calculateDuration(conversationHistory);
         const severity = getMaxSeverity(conversationHistory);
 
@@ -707,9 +761,6 @@ function loadAttendance(attendance) {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-// Variável global para controlar o ID do atendimento atual sendo visualizado
-let currentViewingId = null;
-
 // Função para visualizar uma conversa específica
 async function viewConversation(chatId) {
     try {
@@ -726,23 +777,29 @@ async function viewConversation(chatId) {
             return;
         }
 
+        // Faz backup da conversa atual antes de visualizar outra
+        if (!isViewingHistory) {
+            currentConversationBackup = [...conversationHistory];
+            isViewingHistory = true;
+        }
+
         // Mostra indicador de carregamento
         const loadingToast = showToast('Carregando conversa...', 'info', true);
 
         try {
-            // Carrega as mensagens do atendimento
-            const response = await fetch(`${SERVER_URL}/api/history/${chatId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Erro ao carregar conversa');
+        // Carrega as mensagens do atendimento
+        const response = await fetch(`${SERVER_URL}/api/history/${chatId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
             }
+        });
 
-            const chat = await response.json();
-            
+        if (!response.ok) {
+            throw new Error('Erro ao carregar conversa');
+        }
+
+        const chat = await response.json();
+        
             // Remove o indicador de carregamento
             if (loadingToast && loadingToast.remove) {
                 loadingToast.remove();
@@ -763,35 +820,29 @@ async function viewConversation(chatId) {
                         }
                     });
 
-                    // Adiciona botão para voltar ao histórico
-                    const actionsDiv = document.createElement('div');
-                    actionsDiv.className = 'message bot-message';
-                    actionsDiv.innerHTML = `
-                        <div class="message-content">
-                            <div class="attendance-actions">
-                                <button class="attendance-button continue" onclick="returnToCurrentAttendance()">
+        // Adiciona botão para voltar ao histórico
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'message bot-message';
+        actionsDiv.innerHTML = `
+            <div class="message-content">
+                <div class="attendance-actions">
+                    <button class="attendance-button continue" onclick="returnToCurrentAttendance()">
                                     <i class="fas fa-arrow-left"></i>
-                                    Voltar ao Atendimento Atual
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    chatMessages.appendChild(actionsDiv);
+                        Voltar ao Atendimento Atual
+                    </button>
+                </div>
+            </div>
+        `;
+        chatMessages.appendChild(actionsDiv);
                 }
-
-                // Rola para o topo da conversa
-                chatMessages.scrollTop = 0;
             }
-        } catch (error) {
-            console.error('Erro ao carregar conversa:', error);
-            if (loadingToast && loadingToast.remove) {
-                loadingToast.remove();
-            }
-            showToast('Erro ao carregar conversa. Tente novamente.', 'error');
+    } catch (error) {
+        console.error('Erro ao carregar conversa:', error);
+        showToast('Erro ao carregar conversa. Tente novamente.', 'error');
         }
     } catch (error) {
         console.error('Erro ao visualizar conversa:', error);
-        showToast('Erro ao carregar conversa. Tente novamente.', 'error');
+        showToast('Erro ao visualizar conversa. Tente novamente.', 'error');
     }
 }
 
@@ -1034,28 +1085,46 @@ function displayHistory(history) {
 }
 
 // Função para retornar ao atendimento atual
-function returnToCurrentAttendance() {
+async function returnToCurrentAttendance() {
     console.log('Retornando ao atendimento atual...');
-    currentViewingId = null;
-    
-    // Limpa o chat
-    if (chatMessages) {
-        chatMessages.innerHTML = '';
-    }
-    
-    // Se houver mensagens no atendimento atual, exibe elas
-    if (conversationHistory && conversationHistory.length > 0) {
-        conversationHistory.forEach(message => {
-            addMessage(message.content, message.role === 'assistant');
-        });
-    } else {
-        // Se não houver mensagens, inicia um novo atendimento
-        startNewSession();
-    }
-    
-    // Rola para o final da conversa
-    if (chatMessages) {
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+    try {
+        removeAllToasts();
+        const loadingToast = showToast('Carregando atendimento atual...', 'info', true);
+        currentViewingId = null;
+        isViewingHistory = false;
+        if (chatMessages) {
+            // Limpa o chat completamente
+            while (chatMessages.firstChild) {
+                chatMessages.removeChild(chatMessages.firstChild);
+            }
+            if (currentConversationBackup && currentConversationBackup.length > 0) {
+                // Sincroniza o histórico real com o backup
+                conversationHistory = [...currentConversationBackup];
+                // Se for o início da conversa, mostra sintomas rápidos
+                if (currentConversationBackup.length === 1 && currentConversationBackup[0].role === 'assistant') {
+                    const quickSymptomsContainer = createQuickSymptoms();
+                    if (quickSymptomsContainer && chatMessages) {
+                        chatMessages.appendChild(quickSymptomsContainer);
+                    }
+                }
+                // Exibe apenas as mensagens do backup, sem adicionar ao histórico
+                currentConversationBackup.forEach(message => {
+                    if (message && message.content) {
+                        addMessage(message.content, message.role === 'assistant', false, false);
+                    }
+                });
+            } else {
+                startNewSession();
+            }
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        if (loadingToast && loadingToast.remove) {
+            loadingToast.remove();
+        }
+        showToast('Atendimento atual restaurado', 'success');
+    } catch (error) {
+        console.error('Erro ao retornar ao atendimento atual:', error);
+        showToast('Erro ao retornar ao atendimento atual. Tente novamente.', 'error');
     }
 }
 
@@ -1065,18 +1134,19 @@ function startNewSession() {
     // Limpa o chat
     const chatMessages = document.querySelector('.chat-messages');
     if (chatMessages) {
-        chatMessages.innerHTML = '';
+    chatMessages.innerHTML = '';
     }
-    
     // Reseta o histórico
     conversationHistory = [];
-    
+    // Adiciona sintomas rápidos novamente
+    const quickSymptomsContainer = createQuickSymptoms();
+    if (quickSymptomsContainer && chatMessages) {
+        chatMessages.appendChild(quickSymptomsContainer);
+    }
     // Adiciona a mensagem inicial
     addMessage(WELCOME_MESSAGE, true);
-    
     // Reseta o progresso
     updateProgress(0);
-    
     // Fecha o modal de confirmação se estiver aberto
     const modalOverlay = document.getElementById('confirmationOverlay');
     const modal = document.getElementById('confirmationModal');
@@ -1098,6 +1168,12 @@ async function showAttendanceHistory() {
             return;
         }
 
+        // Faz backup da conversa atual ao abrir o histórico
+        if (!isViewingHistory) {
+            currentConversationBackup = [...conversationHistory];
+            isViewingHistory = true;
+        }
+
         // Mostra indicador de carregamento
         const loadingToast = showToast('Carregando histórico...', 'info', true);
 
@@ -1112,15 +1188,12 @@ async function showAttendanceHistory() {
         }
 
         const history = await response.json();
-        
         // Remove o indicador de carregamento
         loadingToast.remove();
-
         // Limpa o chat atual
         if (chatMessages) {
             chatMessages.innerHTML = '';
         }
-
         // Exibe o histórico
         displayHistory(history);
     } catch (error) {
@@ -1279,10 +1352,16 @@ function finishAttendance() {
 }
 
 // Adiciona event listeners para resetar o timeout quando houver interação
+if (userInput) {
 userInput.addEventListener('keypress', startInactivityCheck);
 userInput.addEventListener('input', startInactivityCheck);
-document.querySelector('.chat-messages').addEventListener('click', startInactivityCheck);
-document.querySelector('.chat-messages').addEventListener('touchstart', startInactivityCheck);
+}
+
+const chatMessagesElement = document.querySelector('.chat-messages');
+if (chatMessagesElement) {
+    chatMessagesElement.addEventListener('click', startInactivityCheck);
+    chatMessagesElement.addEventListener('touchstart', startInactivityCheck);
+}
 
 // Função para inicializar o painel de acessibilidade
 function initializeAccessibilityPanel() {
@@ -1306,11 +1385,11 @@ function initializeAccessibilityPanel() {
         console.log('Configurando botão de acessibilidade');
         accessibilityToggle.addEventListener('click', function(e) {
             e.preventDefault();
-            e.stopPropagation();
+        e.stopPropagation();
             console.log('Botão de acessibilidade clicado');
             if (accessibilityPanel && accessibilityOverlay) {
-                accessibilityPanel.classList.toggle('active');
-                accessibilityOverlay.classList.toggle('active');
+        accessibilityPanel.classList.toggle('active');
+        accessibilityOverlay.classList.toggle('active');
                 console.log('Estado do painel:', {
                     panelActive: accessibilityPanel.classList.contains('active'),
                     overlayActive: accessibilityOverlay.classList.contains('active')
@@ -1331,8 +1410,8 @@ function initializeAccessibilityPanel() {
             e.stopPropagation();
             console.log('Botão de fechar clicado');
             if (accessibilityPanel && accessibilityOverlay) {
-                accessibilityPanel.classList.remove('active');
-                accessibilityOverlay.classList.remove('active');
+        accessibilityPanel.classList.remove('active');
+        accessibilityOverlay.classList.remove('active');
                 console.log('Painel fechado');
             }
         });
@@ -1346,27 +1425,27 @@ function initializeAccessibilityPanel() {
             e.stopPropagation();
             console.log('Overlay clicado');
             if (accessibilityPanel) {
-                accessibilityPanel.classList.remove('active');
-                accessibilityOverlay.classList.remove('active');
+        accessibilityPanel.classList.remove('active');
+        accessibilityOverlay.classList.remove('active');
                 console.log('Painel fechado pelo overlay');
             }
-        });
+    });
     }
     
     // Configura os botões de fonte
     const fontButtons = document.querySelectorAll('.font-buttons-container .font-button');
     if (fontButtons.length > 0) {
         console.log('Configurando botões de fonte:', fontButtons.length);
-        fontButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const size = button.dataset.size;
+    fontButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const size = button.dataset.size;
                 console.log('Alterando tamanho da fonte para:', size);
-                setFontSize(size);
-                fontButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                saveAccessibilityPreferences();
-            });
+            setFontSize(size);
+            fontButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            saveAccessibilityPreferences();
         });
+    });
     } else {
         console.warn('Nenhum botão de fonte encontrado');
     }
@@ -1375,16 +1454,16 @@ function initializeAccessibilityPanel() {
     const spacingButtons = document.querySelectorAll('.spacing-buttons-container .spacing-button');
     if (spacingButtons.length > 0) {
         console.log('Configurando botões de espaçamento:', spacingButtons.length);
-        spacingButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const spacing = button.dataset.spacing;
+    spacingButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const spacing = button.dataset.spacing;
                 console.log('Alterando espaçamento para:', spacing);
-                setTextSpacing(spacing);
-                spacingButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                saveAccessibilityPreferences();
-            });
+            setTextSpacing(spacing);
+            spacingButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            saveAccessibilityPreferences();
         });
+    });
     } else {
         console.warn('Nenhum botão de espaçamento encontrado');
     }
@@ -1393,11 +1472,11 @@ function initializeAccessibilityPanel() {
     const dyslexicToggle = document.getElementById('dyslexicToggle');
     if (dyslexicToggle) {
         console.log('Configurando toggle de dislexia');
-        dyslexicToggle.addEventListener('change', () => {
+    dyslexicToggle.addEventListener('change', () => {
             console.log('Toggle de dislexia alterado:', dyslexicToggle.checked);
-            document.body.classList.toggle('dyslexic-font', dyslexicToggle.checked);
-            saveAccessibilityPreferences();
-        });
+        document.body.classList.toggle('dyslexic-font', dyslexicToggle.checked);
+        saveAccessibilityPreferences();
+    });
     }
 
     // Configura o toggle de voz
@@ -1408,7 +1487,7 @@ function initializeAccessibilityPanel() {
             console.log('Toggle de voz alterado:', voiceToggle.checked);
             if (voiceToggle.checked) {
                 initializeVoiceRecognition();
-            } else {
+        } else {
                 stopVoiceRecognition();
             }
             updateVoiceButtonVisibility();
@@ -1469,8 +1548,8 @@ function createQuickSymptoms() {
         button.innerHTML = `<i class="fas ${symptom.icon}"></i>${symptom.text}`;
         button.onclick = () => {
             if (userInput) {
-                userInput.value = `Estou com ${symptom.text.toLowerCase()}`;
-                handleSendMessage();
+            userInput.value = `Estou com ${symptom.text.toLowerCase()}`;
+            handleSendMessage();
             }
         };
         container.appendChild(button);
@@ -1508,29 +1587,27 @@ function selectPainLevel(level) {
 function createFeedback() {
     const feedbackDiv = document.createElement('div');
     feedbackDiv.className = 'feedback-container';
-    
     feedbackDiv.innerHTML = `
-        <div class="feedback-title">Como foi seu atendimento?</div>
-        <div class="stars-container">
+        <div class="feedback-title" style="font-size: 1.2em; font-weight: 600; margin-bottom: 10px; text-align: center;">Como foi seu atendimento?</div>
+        <div class="stars-container" style="display: flex; justify-content: center; gap: 8px; margin-bottom: 10px;">
             ${Array.from({length: 5}, (_, i) => `
-                <button class="star-button" onclick="rateFeedback(${i + 1})">
+                <button class="star-button" onclick="rateFeedback(${i + 1})" style="background: none; border: none; cursor: pointer; font-size: 2em; color: #FFD700; transition: transform 0.2s;">
                     <i class="fas fa-star"></i>
                 </button>
             `).join('')}
         </div>
-        <textarea class="feedback-input" placeholder="Deixe seu comentário ou sugestão (opcional)"></textarea>
-        <div class="action-buttons">
-            <button class="action-button" onclick="submitFeedback()">
+        <textarea class="feedback-input" placeholder="Deixe seu comentário ou sugestão (opcional)" style="width: 100%; border-radius: 8px; border: 1px solid #ccc; padding: 8px; margin-bottom: 10px; resize: vertical;"></textarea>
+        <div class="action-buttons" style="display: flex; gap: 10px; justify-content: center;">
+            <button class="action-button" onclick="submitFeedback()" style="background: #2196F3; color: white; border: none; border-radius: 20px; padding: 10px 20px; font-weight: 500; cursor: pointer;">
                 <i class="fas fa-paper-plane"></i>
                 Enviar Feedback
             </button>
-            <button class="action-button secondary" onclick="exportToPDF()">
+            <button class="action-button secondary" onclick="exportToPDF()" style="background: white; color: #2196F3; border: 1px solid #2196F3; border-radius: 20px; padding: 10px 20px; font-weight: 500; cursor: pointer;">
                 <i class="fas fa-file-pdf"></i>
                 Exportar PDF
             </button>
         </div>
     `;
-    
     return feedbackDiv;
 }
 
@@ -1600,55 +1677,38 @@ async function exportToPDF() {
         // Função auxiliar para adicionar texto com quebra de linha
         function addWrappedText(text, y) {
             const textWidth = pageWidth - 2 * margin;
-            
-            // Divide o texto em parágrafos
             const paragraphs = text.split('\n');
             let currentY = y;
-            
             for (const paragraph of paragraphs) {
                 if (paragraph.trim()) {
                     const splitText = doc.splitTextToSize(paragraph.trim(), textWidth);
                     doc.text(splitText, margin, currentY);
                     currentY += (splitText.length * lineHeight);
                 }
-                currentY += lineHeight; // Adiciona espaço entre parágrafos
+                currentY += lineHeight;
             }
-            
             return currentY;
         }
         
-        // Adiciona mensagens
+        // Adiciona mensagens (removendo duplicatas por conteúdo e papel)
         doc.setFontSize(11);
+        const seen = new Set();
         for (const message of conversationHistory) {
-            // Pula mensagens vazias
-            if (!message.content.trim()) continue;
-            
-            // Limpa o texto de caracteres especiais
+            const key = message.role + '|' + message.content;
+            if (!message.content.trim() || seen.has(key)) continue;
+            seen.add(key);
             const cleanedContent = cleanTextForPDF(message.content);
-            
-            // Define o prefixo baseado no papel
             const prefix = message.role === 'assistant' ? 'Médico: ' : 'Paciente: ';
-            
-            // Adiciona a mensagem com quebra de linha
             const text = `${prefix}${cleanedContent}`;
             yPosition = addWrappedText(text, yPosition);
-            
-            // Adiciona espaço entre mensagens
             yPosition += lineHeight;
-            
-            // Verifica se precisa de nova página
             if (yPosition > doc.internal.pageSize.getHeight() - margin) {
                 doc.addPage();
                 yPosition = margin;
             }
         }
-        
-        // Salva o PDF
         doc.save('triagem-medica.pdf');
-        
-        // Mostra mensagem de sucesso
         showToast('PDF gerado com sucesso!');
-        
     } catch (error) {
         console.error('Erro ao gerar PDF:', error);
         showToast('Erro ao gerar PDF. Tente novamente.', 'error');
@@ -1684,7 +1744,7 @@ function showToast(message, type = 'success', persistent = false) {
 function initializeEmergencyButton() {
     try {
         const emergencyButton = document.querySelector('.emergency-menu-button');
-        const emergencyPanel = document.getElementById('emergencyPanel');
+    const emergencyPanel = document.getElementById('emergencyPanel');
         const menuOverlay = document.getElementById('menuOverlay');
 
         if (!emergencyButton || !emergencyPanel || !menuOverlay) {
@@ -1725,9 +1785,9 @@ function handleOverlayClick() {
     const emergencyPanel = document.getElementById('emergencyPanel');
     const menuOverlay = document.getElementById('menuOverlay');
     if (emergencyPanel && menuOverlay) {
-        emergencyPanel.classList.remove('active');
+            emergencyPanel.classList.remove('active');
         menuOverlay.classList.remove('active');
-    }
+        }
 }
 
 // Função para atualizar visibilidade do botão de voz
@@ -1740,12 +1800,12 @@ function updateVoiceButtonVisibility() {
 // Função para inicializar o reconhecimento de voz
 function initializeVoiceRecognition() {
     try {
-        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-            console.warn('Reconhecimento de voz não suportado neste navegador');
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        console.warn('Reconhecimento de voz não suportado neste navegador');
             if (voiceButton) voiceButton.style.display = 'none';
             if (voiceToggle) voiceToggle.checked = false;
-            return;
-        }
+        return;
+    }
 
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         recognition = new SpeechRecognition();
@@ -1757,7 +1817,7 @@ function initializeVoiceRecognition() {
             console.log('Reconhecimento de voz iniciado');
             isListening = true;
             if (voiceButton) {
-                voiceButton.classList.add('recording');
+            voiceButton.classList.add('recording');
                 const icon = voiceButton.querySelector('i');
                 if (icon) icon.className = 'fas fa-stop';
             }
@@ -1768,7 +1828,7 @@ function initializeVoiceRecognition() {
             console.log('Reconhecimento de voz finalizado');
             isListening = false;
             if (voiceButton) {
-                voiceButton.classList.remove('recording');
+            voiceButton.classList.remove('recording');
                 const icon = voiceButton.querySelector('i');
                 if (icon) icon.className = 'fas fa-microphone';
             }
@@ -1780,17 +1840,17 @@ function initializeVoiceRecognition() {
             const transcript = event.results[0][0].transcript;
             console.log('Texto reconhecido:', transcript);
             if (userInput) {
-                userInput.value = transcript;
-                handleSendMessage();
+            userInput.value = transcript;
+            handleSendMessage();
             }
             removeAllToasts();
         };
 
         recognition.onerror = (event) => {
             console.error('Erro no reconhecimento de voz:', event.error);
-            isListening = false;
+        isListening = false;
             if (voiceButton) {
-                voiceButton.classList.remove('recording');
+        voiceButton.classList.remove('recording');
                 const icon = voiceButton.querySelector('i');
                 if (icon) icon.className = 'fas fa-microphone';
             }
@@ -1800,7 +1860,7 @@ function initializeVoiceRecognition() {
         console.log('Reconhecimento de voz inicializado com sucesso');
         return true;
 
-    } catch (error) {
+        } catch (error) {
         console.error('Erro ao inicializar reconhecimento de voz:', error);
         if (voiceButton) voiceButton.style.display = 'none';
         if (voiceToggle) voiceToggle.checked = false;
@@ -1928,7 +1988,6 @@ function scheduleFollowUp() {
         content: 'Para agendar um retorno, por favor entre em contato com nossa central de agendamento pelos telefones:\n\n📞 SAMU: 192\n📞 Bombeiros: 193\n\nOu procure a unidade de saúde mais próxima.'
     };
     addMessage(message.content, true);
-    conversationHistory.push(message);
 }
 
 // Função para avaliar o atendimento
@@ -1956,10 +2015,9 @@ function submitRating(rating) {
         content: `Obrigado por avaliar nosso atendimento com ${rating} estrelas! 🌟\nSua opinião é muito importante para melhorarmos nosso serviço.`
     };
     addMessage(message.content, true);
-    conversationHistory.push(message);
 }
 
-// Função para enviar mensagem
+// Modificar a função handleSendMessage para incluir as novas verificações
 async function handleSendMessage() {
     console.log('Iniciando envio de mensagem...');
     
@@ -1972,13 +2030,37 @@ async function handleSendMessage() {
     userInput.value = '';
 
     try {
+        // Reseta o timer de inatividade
+        resetInactivityTimer();
+
         // Adiciona a mensagem do usuário ao chat e ao histórico
         addMessage(message, false);
-        conversationHistory.push({
-            role: 'user',
-            content: message,
-            timestamp: new Date().toISOString()
-        });
+
+        // Verifica se é um agradecimento
+        if (containsThankWord(message)) {
+            const thankResponse = {
+                role: 'assistant',
+                content: 'De nada! Posso ajudar com mais alguma coisa? Se não, podemos finalizar o atendimento.'
+            };
+            
+            addMessage(thankResponse.content, true);
+            
+            // Adiciona botões de ação
+            const actionButtons = document.createElement('div');
+            actionButtons.className = 'message-actions';
+            actionButtons.innerHTML = `
+                <button class="action-button" onclick="finishAttendanceWithSummary()">
+                    <i class="fas fa-check-circle"></i>
+                    Finalizar Atendimento
+                </button>
+                <button class="action-button" onclick="continueAttendance()">
+                    <i class="fas fa-comments"></i>
+                    Continuar Atendimento
+                </button>
+            `;
+            chatMessages.appendChild(actionButtons);
+            return;
+        }
 
         // Mostra o indicador de digitação
         const typingIndicator = showTypingIndicator();
@@ -1995,12 +2077,6 @@ async function handleSendMessage() {
                 console.log('Resposta recebida:', response.message);
                 // Adiciona a resposta do bot ao chat e ao histórico
                 addMessage(response.message, true);
-                conversationHistory.push({
-                    role: 'assistant',
-                    content: response.message,
-                    timestamp: new Date().toISOString()
-                });
-
                 // Atualiza o progresso da triagem
                 updateProgress();
 
@@ -2016,25 +2092,33 @@ async function handleSendMessage() {
                 addMessage('Desculpe, ocorreu um erro ao processar sua mensagem. Por favor, tente novamente.', true);
             }
         } catch (error) {
-            console.error('Erro ao processar mensagem:', error);
+            console.error('Erro ao enviar mensagem:', error);
             removeTypingIndicator(typingIndicator);
             addMessage('Desculpe, ocorreu um erro ao processar sua mensagem. Por favor, tente novamente.', true);
         }
-
-        // Reseta o timer de inatividade
-        resetTimer();
     } catch (error) {
-        console.error('Erro ao enviar mensagem:', error);
+        console.error('Erro no handleSendMessage:', error);
         addMessage('Desculpe, ocorreu um erro ao processar sua mensagem. Por favor, tente novamente.', true);
     }
 }
+
+// Inicializa o timer de inatividade quando a página carrega
+document.addEventListener('DOMContentLoaded', () => {
+    resetInactivityTimer();
+    
+    // Reseta o timer quando houver interação do usuário
+    document.addEventListener('mousemove', resetInactivityTimer);
+    document.addEventListener('keypress', resetInactivityTimer);
+    document.addEventListener('click', resetInactivityTimer);
+    document.addEventListener('scroll', resetInactivityTimer);
+});
 
 // Função para alternar o reconhecimento de voz
 function toggleVoiceRecognition() {
     console.log('Alternando reconhecimento de voz');
     if (isListening) {
         stopVoiceRecognition();
-    } else {
+                } else {
         startVoiceRecognition();
     }
 }
@@ -2095,7 +2179,7 @@ async function initialize() {
         initializeNewSessionButton();
 
         // Cria os sintomas rápidos
-        const quickSymptomsContainer = createQuickSymptoms();
+                const quickSymptomsContainer = createQuickSymptoms();
         const chatContainer = document.querySelector('.chat-container');
         if (chatContainer) {
             chatContainer.insertBefore(quickSymptomsContainer, chatContainer.firstChild);

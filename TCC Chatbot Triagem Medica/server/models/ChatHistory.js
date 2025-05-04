@@ -25,7 +25,8 @@ const chatHistorySchema = new mongoose.Schema({
     },
     duration: {
         type: String,
-        required: true
+        required: false,
+        default: '< 1 min'
     },
     conversation: [{
         role: {

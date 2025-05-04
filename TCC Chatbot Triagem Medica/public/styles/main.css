@@ -1226,14 +1226,13 @@ body {
 }
 
 /* Botões de ação do atendimento */
-.attendance-actions {
+.message-actions {
     display: flex;
     gap: 10px;
-    margin-top: 15px;
+    margin-top: 10px;
 }
 
-.attendance-button {
-    flex: 1;
+.action-button {
     padding: 10px 20px;
     border-radius: 20px;
     border: none;
@@ -1244,46 +1243,33 @@ body {
     align-items: center;
     justify-content: center;
     gap: 8px;
-}
-
-.attendance-button.continue {
+    min-width: 200px;
     background-color: var(--primary-color);
     color: white;
 }
 
-.attendance-button.finish {
-    background-color: var(--success-color);
-    color: white;
-}
-
-.attendance-button:hover {
+.action-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.attendance-button i {
-    font-size: 16px;
+.action-button i {
+    font-size: 1.1em;
 }
 
-/* Modo escuro */
-[data-theme="dark"] .attendance-button.continue {
-    background-color: var(--secondary-color);
-}
-
-[data-theme="dark"] .attendance-button.finish {
-    background-color: #388E3C;
+/* Tema escuro */
+[data-theme="dark"] .action-button {
+    background-color: var(--primary-color-dark);
 }
 
 /* Responsividade */
 @media (max-width: 768px) {
-    .attendance-actions {
+    .message-actions {
         flex-direction: column;
-        gap: 8px;
     }
-    
-    .attendance-button {
-        padding: 8px 16px;
-        font-size: 14px;
+
+    .action-button {
+        width: 100%;
     }
 }
 
@@ -1873,12 +1859,6 @@ body[data-spacing="large"] .chat-input {
     display: flex;
     gap: 10px;
     margin-top: 10px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.bot-message:hover .message-actions {
-    opacity: 1;
 }
 
 .action-button {
