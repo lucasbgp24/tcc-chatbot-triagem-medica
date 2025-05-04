@@ -406,36 +406,6 @@ emergencyButton.addEventListener('click', (e) => {
     }
 });
 
-// Fecha o painel quando clicar no botão de fechar
-closeEmergency.addEventListener('click', (e) => {
-    e.stopPropagation();
-    emergencyPanel.classList.remove('active');
-    menuOverlay.classList.remove('active');
-});
-
-// Fecha o painel quando clicar no overlay
-menuOverlay.addEventListener('click', () => {
-    emergencyPanel.classList.remove('active');
-    menuOverlay.classList.remove('active');
-});
-
-// Comportamento dos links de emergência
-emergencyContacts.forEach(contact => {
-    contact.addEventListener('click', (e) => {
-        if (!isMobileDevice()) {
-            e.preventDefault();
-            const number = contact.querySelector('.contact-number').textContent;
-            const name = contact.querySelector('.contact-name').textContent;
-            
-            // Copia o número para a área de transferência
-            navigator.clipboard.writeText(number).then(() => {
-                showToast(`Número ${number} (${name}) copiado para a área de transferência`, 'success');
-            });
-        }
-        // Em dispositivos móveis, o comportamento padrão do href="tel:" será mantido
-    });
-});
-
 // Função para verificar conexão com o servidor
 async function checkServerConnection() {
     try {
@@ -1744,14 +1714,16 @@ function showToast(message, type = 'success', persistent = false) {
 function initializeEmergencyButton() {
     try {
         const emergencyButton = document.querySelector('.emergency-menu-button');
-    const emergencyPanel = document.getElementById('emergencyPanel');
+        const emergencyPanel = document.getElementById('emergencyPanel');
         const menuOverlay = document.getElementById('menuOverlay');
+        const closeEmergency = document.querySelector('#emergencyPanel .close-button');
 
-        if (!emergencyButton || !emergencyPanel || !menuOverlay) {
+        if (!emergencyButton || !emergencyPanel || !menuOverlay || !closeEmergency) {
             console.log('Elementos de emergência não encontrados:', {
                 button: !!emergencyButton,
                 panel: !!emergencyPanel,
-                overlay: !!menuOverlay
+                overlay: !!menuOverlay,
+                closeButton: !!closeEmergency
             });
             return;
         }
@@ -1759,14 +1731,26 @@ function initializeEmergencyButton() {
         // Remove listeners antigos se existirem
         emergencyButton.removeEventListener('click', handleEmergencyClick);
         menuOverlay.removeEventListener('click', handleOverlayClick);
+        closeEmergency.removeEventListener('click', handleCloseEmergencyClick);
 
         // Adiciona novos listeners
         emergencyButton.addEventListener('click', handleEmergencyClick);
         menuOverlay.addEventListener('click', handleOverlayClick);
+        closeEmergency.addEventListener('click', handleCloseEmergencyClick);
 
         console.log('Botão de emergência configurado com sucesso');
     } catch (error) {
         console.error('Erro ao configurar botão de emergência:', error);
+    }
+}
+
+function handleCloseEmergencyClick(e) {
+    e.stopPropagation();
+    const emergencyPanel = document.getElementById('emergencyPanel');
+    const menuOverlay = document.getElementById('menuOverlay');
+    if (emergencyPanel && menuOverlay) {
+        emergencyPanel.classList.remove('active');
+        menuOverlay.classList.remove('active');
     }
 }
 
