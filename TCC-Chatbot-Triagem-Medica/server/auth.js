@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { MongoClient } = require('mongodb');
+const cors = require('cors');
 
 // Configuração do MongoDB
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
@@ -169,5 +170,9 @@ router.get('/profile', verifyToken, async (req, res) => {
         res.status(500).json({ message: 'Erro ao buscar perfil' });
     }
 });
+
+router.use(cors({
+  origin: 'https://tcc-chatbot-triagem-medica.vercel.app'
+}));
 
 module.exports = router; 
