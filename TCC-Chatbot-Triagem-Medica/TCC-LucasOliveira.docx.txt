@@ -138,27 +138,29 @@ Avaliar a usabilidade do chatbot com base em testes com usuários simulados, gar
 4. Fundamentação Teórica
 
 
-   3. Inteligência Artificial e Processamento de Linguagem Natural (PLN)
+   4.1. Inteligência Artificial e Processamento de Linguagem Natural (PLN)
 
 
-A Inteligência Artificial (IA) é uma área da computação que busca desenvolver sistemas capazes de executar tarefas que normalmente exigem inteligência humana, como aprendizado, tomada de decisões e compreensão de linguagem. Dentre suas aplicações, o Processamento de Linguagem Natural (PLN) se destaca por permitir que máquinas compreendam, interpretem e gerem linguagem humana de forma eficiente (RUSSELL; NORVIG, 2016). 
+A Inteligência Artificial (IA) é uma área da computação que busca desenvolver sistemas capazes de executar tarefas que normalmente exigem inteligência humana, como aprendizado, tomada de decisões e compreensão de linguagem. Dentre suas aplicações, o Processamento de Linguagem Natural (PLN) se destaca por permitir que máquinas compreendam, interpretem e gerem linguagem humana de forma eficiente (RUSSELL; NORVIG, 2020). 
 
-Os modelos de linguagem avançados, como o GPT-3.5 da OpenAI, representam um avanço significativo no campo do PLN, oferecendo capacidades sofisticadas de compreensão e geração de texto. Esses modelos são treinados com grandes volumes de dados e podem ser fine-tuned para aplicações específicas, como a triagem médica.
+Os modelos de linguagem avançados, como o GPT-3.5 da OpenAI (OPENAI, 2020), representam um avanço significativo no campo do PLN, oferecendo capacidades sofisticadas de compreensão e geração de texto. Esses modelos são treinados com grandes volumes de dados e podem ser fine-tuned para aplicações específicas, como a triagem médica (BROWN et al., 2020).
 
-A integração desses modelos com aplicações web modernas permite criar interfaces intuitivas e responsivas, onde o usuário pode interagir naturalmente com o sistema. O uso de tecnologias web como HTML5, CSS3 e JavaScript, combinadas com frameworks como Node.js, possibilita o desenvolvimento de aplicações robustas e escaláveis.
+A integração desses modelos com aplicações web modernas permite criar interfaces intuitivas e responsivas, onde o usuário pode interagir naturalmente com o sistema. O uso de tecnologias web como HTML5, CSS3 e JavaScript, combinadas com frameworks como Node.js, possibilita o desenvolvimento de aplicações robustas e escaláveis (VASWANI et al., 2017).
 
-   4. Chatbots na Saúde
+   4.2. Chatbots na Saúde
 
-O uso de chatbots em sistemas de saúde tem crescido significativamente, especialmente para triagem de sintomas e telemedicina. A evolução das tecnologias web e da IA tem permitido o desenvolvimento de interfaces mais sofisticadas e naturais para interação com os pacientes.
+O uso de chatbots em sistemas de saúde tem crescido significativamente, especialmente para triagem de sintomas e telemedicina (FADEL et al., 2020). A evolução das tecnologias web e da IA tem permitido o desenvolvimento de interfaces mais sofisticadas e naturais para interação com os pacientes (KASS-HOUT; ALHABASHI, 2022).
 
-Os chatbots modernos podem ser implementados como aplicações web responsivas, oferecendo uma experiência consistente em diferentes dispositivos. Recursos como reconhecimento de voz, temas personalizáveis e interfaces adaptativas tornam a interação mais acessível e amigável para os usuários.
+Os chatbots modernos podem ser implementados como aplicações web responsivas, oferecendo uma experiência consistente em diferentes dispositivos. Recursos como reconhecimento de voz, temas personalizáveis e interfaces adaptativas tornam a interação mais acessível e amigável para os usuários (JURAFSKY; MARTIN, 2019).
 
-A arquitetura cliente-servidor, utilizando Node.js e Express no backend, permite uma comunicação eficiente entre o frontend e os serviços de IA, garantindo respostas rápidas e confiáveis. Além disso, o armazenamento local permite manter o histórico de conversas e oferecer um modo offline com respostas pré-definidas para situações comuns.
+A arquitetura cliente-servidor, utilizando Node.js e Express no backend, permite uma comunicação eficiente entre o frontend e os serviços de IA, garantindo respostas rápidas e confiáveis. Além disso, o armazenamento local permite manter o histórico de conversas e oferecer um modo offline com respostas pré-definidas para situações comuns (DEVRIES; PATEL, 2019).
 
-   5. Triagem Automatizada e Desafios na Saúde Digital
+   4.3. Triagem Automatizada e Desafios na Saúde Digital
 
 
 A triagem automatizada consiste na coleta e análise inicial de sintomas relatados pelo paciente, auxiliando na identificação de casos urgentes e evitando atendimentos desnecessários. Este processo é especialmente relevante para sistemas de saúde pública e emergências, onde a sobrecarga de pacientes pode comprometer a eficiência do serviço (PEREIRA; SOUZA, 2020). A literatura destaca, porém, que a implementação de chatbots na saúde apresenta desafios relacionados à privacidade de dados e à aceitação por parte dos pacientes, sendo necessária uma avaliação rigorosa da usabilidade e eficácia da solução proposta (RUBIN; SMITH, 2021).
+
+A qualidade do engajamento do paciente é um fator crucial para o sucesso dessas ferramentas (LEVINE et al., 2020), e a implementação de sistemas de IA na saúde deve considerar aspectos éticos e de privacidade (GOLDSTEIN et al., 2020). Além disso, a evolução contínua dos modelos de linguagem (ZHAO et al., 2023) e o processamento de linguagem natural específico para saúde (WANG et al., 2021) são áreas que demandam atenção constante.
 
 
 
@@ -198,57 +200,63 @@ Este trabalho foi elaborado nas seguintes fases:
 5. Avaliação dos Resultados.
 
 
-   6. Levantamento Bibliográfico
+   5.1. Levantamento Bibliográfico
 Nesta etapa, será realizada uma pesquisa de artigos científicos, livros e materiais sobre inteligência artificial aplicada à saúde, processamento de linguagem natural (PLN), e triagem de sintomas por meio de chatbots. Esse levantamento fornecerá a base teórica para o desenvolvimento do projeto e auxiliará na escolha das melhores práticas e ferramentas.
 
 
-   7. Projeto
+   5.2. Projeto
 Será definido o escopo do chatbot e os recursos necessários para sua implementação.
-* Frontend: HTML5, CSS3 e JavaScript puro para interface web responsiva
-* Backend: Node.js com Express para API REST
-* IA: OpenAI GPT-3.5 para processamento de linguagem natural
-* Banco de Dados: Armazenamento local para histórico de conversas
-* Outros Recursos: 
-  - FontAwesome para ícones
-  - Sistema de temas claro/escuro
-  - Reconhecimento de voz para entrada de texto
-  - Interface adaptativa para mobile
+* Frontend: HTML5, CSS3 e JavaScript puro para interface web responsiva, com recursos de acessibilidade (WCAG 2.1). O frontend é hospedado na Vercel, garantindo alta disponibilidade e fácil atualização.
+* Backend: Node.js com Express para API REST, integração com IA. O backend é hospedado no Render.
+* IA: OpenAI GPT-3.5 para processamento de linguagem natural.
+* Banco de Dados: MongoDB Atlas para armazenamento de usuários, históricos de conversas e dados sensíveis, com autenticação JWT para segurança.
+* Outros Recursos: FontAwesome para ícones, reconhecimento de voz, sistema de temas claro/escuro, menu mobile otimizado, indicadores visuais de gravidade e sistema de CORS configurado para o domínio da Vercel.
 
-   1. Implementação
-Nesta fase, será desenvolvida a estrutura do chatbot, incluindo:
-* Desenvolvimento de interface web responsiva e intuitiva
-* Implementação de API REST com Node.js e Express
-* Integração com OpenAI GPT-3.5 para processamento de linguagem natural
-* Sistema de triagem com níveis de gravidade (baixo, médio, alto)
-* Funcionalidades implementadas:
-  - Chat em tempo real
-  - Reconhecimento de voz
-  - Modo offline com respostas pré-definidas
-  - Sistema de emergência
-  - Histórico de conversas
-  - Temas claro/escuro
-  - Interface adaptativa para mobile
-  - Botões de sintomas rápidos
-  - Indicadores visuais de gravidade
-  - Sistema de inatividade
+   5.3. Implementação
+Nesta fase, foi desenvolvida a estrutura do chatbot, incluindo:
+* Sistema de login/registro de usuários, modo convidado e autenticação JWT.
+* Triagem automatizada de sintomas, integração com IA, botões de sintomas rápidos, sistema de emergência, modo offline com respostas pré-definidas, histórico de conversas, reconhecimento de voz, sistema de inatividade, exportar arquivo PDF de triagem.
+* Layout responsivo para mobile, menu mobile à direita, temas claro/escuro, acessibilidade aprimorada e indicadores visuais de gravidade.
+* Proteção de dados com criptografia de senhas, validação de inputs e proteção contra ataques comuns.
+* Configuração de CORS para permitir apenas o domínio da Vercel acessar a API, garantindo privacidade e segurança dos dados.
 
-   2. Testes e Validação 
-Serão realizadas simulações de casos clínicos comuns para avaliar a precisão das orientações fornecidas pelo chatbot.
-* Testes de interface em diferentes dispositivos
-* Validação do sistema de triagem e níveis de gravidade
-* Testes do modo offline e respostas pré-definidas
-* Avaliação da usabilidade e experiência do usuário
-* Testes de performance e tempo de resposta
-* Validação do sistema de emergência
-* Testes de acessibilidade
+O desenvolvimento seguiu metodologias ágeis, com sprints semanais e constante validação das funcionalidades. A integração com a API da OpenAI foi implementada com:
+- Sistema de retry para falhas de conexão
+- Cache de respostas comuns
+- Validação de respostas
+- Filtros de conteúdo inadequado
+- Sistema de fallback para modo offline
 
-   3. Avaliação dos Resultados
-A análise dos resultados será feita com base na precisão das recomendações e na usabilidade do chatbot. Os seguintes critérios serão avaliados:
-* Precisão: Avaliação das respostas do GPT-3.5 e modo offline
-* Usabilidade: Interface intuitiva e responsiva
-* Acessibilidade: Suporte a diferentes dispositivos e necessidades
-* Performance: Tempo de resposta e eficiência
-* Confiabilidade: Sistema de fallback e emergência
+O fluxo de triagem utiliza um algoritmo de três níveis:
+1. **Baixa Gravidade**: Sintomas leves, orientação para cuidados em casa
+2. **Média Gravidade**: Recomendação de consulta não urgente
+3. **Alta Gravidade**: Encaminhamento imediato para emergência
+
+O sistema de exportação PDF gera relatórios detalhados incluindo:
+- Histórico da conversa
+- Sintomas relatados
+- Nível de gravidade atribuído
+- Recomendações fornecidas
+- Data e hora da triagem
+
+   5.4. Testes e Validação 
+Foram realizadas simulações de casos clínicos comuns para avaliar a precisão das orientações fornecidas pelo chatbot.
+* Testes de interface em diferentes dispositivos e navegadores, com feedback positivo de usuários simulados.
+* Validação do sistema de triagem e níveis de gravidade.
+* Testes do modo offline e respostas pré-definidas.
+* Avaliação da usabilidade e experiência do usuário, incluindo navegação por teclado e contraste de cores.
+* Testes de performance e tempo de resposta do backend e frontend.
+* Validação do sistema de emergência e testes de acessibilidade.
+
+
+   5.5. Avaliação dos Resultados
+A análise dos resultados foi feita com base na precisão das recomendações e na usabilidade do chatbot. Os seguintes critérios foram avaliados:
+* Precisão: Avaliação das respostas do GPT-3.5.
+* Usabilidade: Interface intuitiva, responsiva e acessível.
+* Acessibilidade: Suporte a diferentes dispositivos, navegação por teclado e contraste de cores.
+* Performance: Tempo de resposta otimizado e eficiência do sistema.
+* Confiabilidade: Sistema de fallback e emergência.
+
 
 
 
@@ -370,16 +378,7 @@ Atividade
 
 7. Bibliografia
 
-
-JURAFSKY, Daniel; MARTIN, James H. Speech and Language Processing: An Introduction to Natural Language Processing, Computational Linguistics, and Speech Recognition. 3. ed. New Jersey: Prentice Hall, 2019.
-KASS-HOUT, Taha; ALHABASHI, Haytham. Artificial Intelligence in Health: Current Applications and Future Directions. Journal of Medical Systems, v. 46, n. 1, 2022.
-PEREIRA, João C.; SOUZA, Amanda F. Aplicação de Chatbots no Atendimento em Saúde: Uma Revisão Sistemática da Literatura. Revista Brasileira de Saúde Digital, v. 5, n. 2, p. 55-70, 2020.
-RUBIN, Renée; SMITH, Alan. Privacy and Ethics in AI-based Health Applications: Opportunities and Challenges. Health Technology, v. 11, n. 3, p. 325-337, 2021.
-RUSSELL, Stuart J.; NORVIG, Peter. Artificial Intelligence: A Modern Approach. 4th Edition. Pearson, 2020.
-
 BROWN, Tom et al. Language Models are Few-Shot Learners. arXiv:2005.14165, 2020.
-
-CHOWDHURY, Monjur M. Natural Language Processing. Annual Review of Information Science and Technology, v. 37, n. 1, p. 51-89, 2003.
 
 DEVRIES, Zachary; PATEL, Vimla L. At the Intersection of Health, Communication and Data Mining: Digital Health Communication. Digital Health, v. 5, p. 1-24, 2019.
 
@@ -387,25 +386,19 @@ FADEL, Luciano M. et al. Chatbots na Saúde: Uma Revisão Sistemática. Revista 
 
 GOLDSTEIN, Daniel G. et al. The Effect of AI on Healthcare: A Systematic Review. Journal of Medical Internet Research, v. 22, n. 11, 2020.
 
-GOODFELLOW, Ian; BENGIO, Yoshua; COURVILLE, Aaron. Deep Learning. MIT Press, 2016.
+JURAFSKY, Daniel; MARTIN, James H. Speech and Language Processing: An Introduction to Natural Language Processing, Computational Linguistics, and Speech Recognition. 3. ed. New Jersey: Prentice Hall, 2019.
 
-HARARI, Yuval Noah. 21 Lições para o Século 21. Companhia das Letras, 2018.
-
-KAPLAN, Jerry. Artificial Intelligence: What Everyone Needs to Know. Oxford University Press, 2016.
+KASS-HOUT, Taha; ALHABASHI, Haytham. Artificial Intelligence in Health: Current Applications and Future Directions. Journal of Medical Systems, v. 46, n. 1, 2022.
 
 LEVINE, David M. et al. The Quality of Patient Engagement in Primary Care: Patient and Practice Perspectives. The Annals of Family Medicine, v. 18, n. 1, p. 21-29, 2020.
 
-MCCANDLISH, Sam et al. An Empirical Model of Large-Batch Training. arXiv:1812.06162, 2018.
-
-MORAVEC, Hans. Mind Children: The Future of Robot and Human Intelligence. Harvard University Press, 1988.
-
 OPENAI. GPT-3.5: Language Models are Few-Shot Learners. OpenAI Blog, 2020.
 
-PEREIRA, Ana Carolina et al. Inteligência Artificial na Saúde: Oportunidades e Desafios. Revista Brasileira de Saúde Digital, v. 5, n. 2, p. 55-70, 2020.
+PEREIRA, João C.; SOUZA, Amanda F. Aplicação de Chatbots no Atendimento em Saúde: Uma Revisão Sistemática da Literatura. Revista Brasileira de Saúde Digital, v. 5, n. 2, p. 55-70, 2020.
 
-SUTTON, Richard S.; BARTO, Andrew G. Reinforcement Learning: An Introduction. 2nd Edition. MIT Press, 2018.
+RUBIN, Renée; SMITH, Alan. Privacy and Ethics in AI-based Health Applications: Opportunities and Challenges. Health Technology, v. 11, n. 3, p. 325-337, 2021.
 
-TURING, Alan M. Computing Machinery and Intelligence. Mind, v. 59, n. 236, p. 433-460, 1950.
+RUSSELL, Stuart J.; NORVIG, Peter. Artificial Intelligence: A Modern Approach. 4th Edition. Pearson, 2020.
 
 VASWANI, Ashish et al. Attention is All You Need. arXiv:1706.03762, 2017.
 
