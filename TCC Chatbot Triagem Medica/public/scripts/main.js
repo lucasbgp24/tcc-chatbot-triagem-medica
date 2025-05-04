@@ -47,16 +47,8 @@ const logoutButton = document.querySelector('.logout-button');
 const commonSymptoms = [
     { text: 'Dor de cabeça', icon: 'fa-head-side-virus', severity: 'medium' },
     { text: 'Febre', icon: 'fa-temperature-high', severity: 'medium' },
-    { text: 'Tosse', icon: 'fa-head-side-cough', severity: 'low' },
-    { text: 'Dor de garganta', icon: 'fa-head-side-mask', severity: 'low' },
-    { text: 'Náusea', icon: 'fa-face-dizzy', severity: 'medium' },
-    { text: 'Dor no corpo', icon: 'fa-person-dots-from-line', severity: 'medium' },
-    { text: 'Falta de ar', icon: 'fa-lungs-virus', severity: 'high' },
-    { text: 'Dor abdominal', icon: 'fa-stomach', severity: 'medium' },
-    { text: 'Tontura', icon: 'fa-head-side', severity: 'medium' },
-    { text: 'Diarreia', icon: 'fa-toilet', severity: 'medium' },
-    { text: 'Dor no peito', icon: 'fa-heart-crack', severity: 'high' },
-    { text: 'Ansiedade', icon: 'fa-brain', severity: 'low' }
+    { text: 'Gripe', icon: 'fa-head-side-cough', severity: 'medium' },
+    { text: 'Dor no corpo', icon: 'fa-person-dots-from-line', severity: 'medium' }
 ];
 
 // Emojis para diferentes contextos
@@ -628,12 +620,8 @@ async function viewConversation(chatId) {
         actionsDiv.innerHTML = `
             <div class="message-content">
                 <div class="attendance-actions">
-                    <button class="attendance-button continue" onclick="showAttendanceHistory()">
-                        <i class="fas fa-arrow-left"></i>
-                        Voltar ao Histórico
-                    </button>
                     <button class="attendance-button continue" onclick="returnToCurrentAttendance()">
-                        <i class="fas fa-comments"></i>
+                        <i class="fas fa-arrow-left"></i>
                         Voltar ao Atendimento Atual
                     </button>
                 </div>
@@ -674,18 +662,31 @@ function displayHistory(history) {
     // Limpa mensagens atuais
     chatMessages.innerHTML = '';
     
-    // Adiciona mensagem de seleção com mais detalhes
-    const selectionMessage = document.createElement('div');
-    selectionMessage.className = 'message bot-message';
-    selectionMessage.innerHTML = `
-        <div class="message-content">
+    // Cria o container principal do histórico
+    const historyContainer = document.createElement('div');
+    historyContainer.className = 'history-container';
+    
+    // Adiciona o cabeçalho
+    const header = document.createElement('div');
+    header.className = 'history-header';
+    header.innerHTML = `
             <h3><i class="fas fa-history"></i> Histórico de Atendimentos</h3>
             <p>Selecione um atendimento para visualizar:</p>
-            <div class="attendance-list">
-                ${history.length === 0 ? 
-                    '<p class="text-center text-muted">Nenhum histórico encontrado</p>' :
-                    history.map((att, index) => `
-                        <div class="attendance-item" data-id="${att._id}">
+    `;
+    historyContainer.appendChild(header);
+    
+    // Cria a lista de atendimentos com rolagem própria
+    const attendanceList = document.createElement('div');
+    attendanceList.className = 'attendance-list';
+    
+    if (history.length === 0) {
+        attendanceList.innerHTML = '<p class="text-center text-muted">Nenhum histórico encontrado</p>';
+    } else {
+        history.forEach(att => {
+            const attendanceItem = document.createElement('div');
+            attendanceItem.className = 'attendance-item';
+            attendanceItem.setAttribute('data-id', att._id);
+            attendanceItem.innerHTML = `
                             <div class="attendance-header">
                                 <span class="attendance-date">
                                     <i class="far fa-calendar"></i>
@@ -708,43 +709,225 @@ function displayHistory(history) {
                             <button class="btn btn-primary btn-sm view-conversation" onclick="viewConversation('${att._id}')">
                                 <i class="fas fa-eye"></i> Visualizar
                             </button>
-                        </div>
-                    `).join('')}
-            </div>
-            <div class="attendance-actions">
+            `;
+            attendanceList.appendChild(attendanceItem);
+        });
+    }
+    
+    historyContainer.appendChild(attendanceList);
+    
+    // Adiciona o botão de voltar no final
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'attendance-actions';
+    actionsDiv.innerHTML = `
                 <button class="attendance-button continue" onclick="returnToCurrentAttendance()">
                     <i class="fas fa-arrow-left"></i>
                     Voltar ao Atendimento Atual
                 </button>
-                <button class="attendance-button continue" onclick="startNewSession()">
-                    <i class="fas fa-plus-circle"></i>
-                    Novo Atendimento
-                </button>
-            </div>
-        </div>
     `;
-    chatMessages.appendChild(selectionMessage);
+    historyContainer.appendChild(actionsDiv);
+    
+    // Adiciona o container ao chat
+    chatMessages.appendChild(historyContainer);
+    
+    // Adiciona estilos dinâmicos para o histórico
+    const style = document.createElement('style');
+    style.textContent = `
+        .history-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            max-height: calc(100vh - 200px);
+            padding: 20px;
+            background: var(--bg-color);
+            border-radius: 15px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        }
+        
+        .history-header {
+            margin-bottom: 15px;
+        }
+        
+        .history-header h3 {
+            font-size: 1.2em;
+            color: var(--text-color);
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        
+        .history-header p {
+            color: var(--text-color-secondary);
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        
+        .attendance-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .attendance-item {
+            background: var(--card-bg-color);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+        
+        .attendance-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .attendance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.85em;
+            color: var(--text-color-secondary);
+        }
+        
+        .attendance-date, .attendance-duration {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .attendance-details {
+            margin: 8px 0;
+        }
+        
+        .attendance-symptoms {
+            margin-bottom: 6px;
+            color: var(--text-color);
+            font-size: 0.9em;
+        }
+        
+        .attendance-severity {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.8em;
+            padding: 3px 6px;
+            border-radius: 4px;
+            background: rgba(0,0,0,0.04);
+            color: var(--text-color-secondary);
+        }
+        
+        .btn.btn-primary.btn-sm.view-conversation {
+            width: 100%;
+            margin-top: 8px;
+            padding: 6px;
+            border-radius: 6px;
+            background: var(--primary-color);
+            border: none;
+            color: white;
+            font-size: 0.85em;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+        
+        .btn.btn-primary.btn-sm.view-conversation:hover {
+            opacity: 1;
+        }
+        
+        .attendance-actions {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0,0,0,0.06);
+        }
+        
+        .attendance-button.continue {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            opacity: 0.9;
+            transition: all 0.2s;
+        }
+        
+        .attendance-button.continue:hover {
+            opacity: 1;
+            transform: translateY(-1px);
+        }
+        
+        /* Estilização da barra de rolagem */
+        .attendance-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .attendance-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .attendance-list::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.1);
+            border-radius: 2px;
+        }
+        
+        .attendance-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(0,0,0,0.15);
+        }
+    `;
+    document.head.appendChild(style);
 }
 
 // Função para retornar ao atendimento atual
 function returnToCurrentAttendance() {
     currentViewingId = null;
-    const currentAttendance = localStorage.getItem('currentAttendance');
-    if (currentAttendance) {
-        try {
-            const attendance = JSON.parse(currentAttendance);
-            if (attendance && attendance.messages && attendance.messages.length > 0) {
-                loadAttendance(attendance);
+    
+    // Limpa o chat
+    chatMessages.innerHTML = '';
+    
+    // Se houver mensagens no atendimento atual, exibe elas
+    if (conversationHistory && conversationHistory.length > 0) {
+        conversationHistory.forEach(message => {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${message.role === 'assistant' ? 'bot-message' : 'user-message'}`;
+            
+            // Adiciona o avatar
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'message-avatar';
+            if (message.role === 'assistant') {
+                avatarDiv.innerHTML = '<i class="fas fa-user-md"></i>';
+                avatarDiv.style.backgroundColor = '#4CAF50';
             } else {
-                startNewSession();
+                avatarDiv.innerHTML = '<i class="fas fa-user"></i>';
+                avatarDiv.style.backgroundColor = '#2196F3';
             }
-        } catch (error) {
-            console.error('Erro ao carregar atendimento:', error);
-            startNewSession();
-        }
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.textContent = message.content;
+            
+            if (message.role === 'assistant') {
+                messageDiv.appendChild(avatarDiv);
+                messageDiv.appendChild(contentDiv);
+            } else {
+                messageDiv.appendChild(contentDiv);
+                messageDiv.appendChild(avatarDiv);
+            }
+            
+            chatMessages.appendChild(messageDiv);
+        });
     } else {
+        // Se não houver mensagens, inicia um novo atendimento
         startNewSession();
     }
+    
+    // Rola para o final da conversa
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 // Função para iniciar novo atendimento
