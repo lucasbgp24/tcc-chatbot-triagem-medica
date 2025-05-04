@@ -596,6 +596,45 @@ app.post('/api/guest', async (req, res) => {
     }
 });
 
+// Rota de health check
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', message: 'Servidor está funcionando' });
+});
+
+// Rota de chat
+app.post('/api/chat', async (req, res) => {
+    try {
+        const { message, isGuest } = req.body;
+        
+        if (!message) {
+            return res.status(400).json({ error: 'Mensagem não fornecida' });
+        }
+
+        // Se não for convidado, verifica o token
+        if (!isGuest) {
+            const token = req.headers.authorization?.split(' ')[1];
+            if (!token) {
+                return res.status(401).json({ error: 'Token não fornecido' });
+            }
+
+            try {
+                const decoded = jwt.verify(token, process.env.JWT_SECRET || 'sua_chave_secreta');
+                req.userId = decoded.id;
+            } catch (error) {
+                return res.status(401).json({ error: 'Token inválido' });
+            }
+        }
+
+        // Obtém resposta do ChatGPT
+        const response = await getChatGPTResponse(message, []);
+        
+        res.json({ message: response });
+    } catch (error) {
+        console.error('Erro no chat:', error);
+        res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+});
+
 // Iniciar o servidor
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {

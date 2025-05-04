@@ -145,16 +145,20 @@
         <h3><i class="fas fa-universal-access"></i> Acessibilidade</h3>
         <div class="accessibility-options">
             <div class="font-controls">
-                <span>Tamanho da fonte:</span>
-                <button class="font-button" data-size="small">A</button>
-                <button class="font-button active" data-size="medium">A</button>
-                <button class="font-button" data-size="large">A</button>
-                <button class="font-button" data-size="xlarge">A</button>
+                <h4>Tamanho da fonte</h4>
+                <div class="font-buttons-container">
+                    <button class="font-button" data-size="small">A</button>
+                    <button class="font-button active" data-size="medium">A</button>
+                    <button class="font-button" data-size="large">A</button>
+                    <button class="font-button" data-size="xlarge">A</button>
+                </div>
             </div>
             <div class="spacing-controls">
-                <span>Espaçamento do texto:</span>
-                <button class="spacing-button" data-spacing="normal">Normal</button>
-                <button class="spacing-button" data-spacing="large">Amplo</button>
+                <h4>Espaçamento do texto</h4>
+                <div class="spacing-buttons-container">
+                    <button class="spacing-button active" data-spacing="normal">Normal</button>
+                    <button class="spacing-button" data-spacing="large">Amplo</button>
+                </div>
             </div>
             <div class="voice-controls">
                 <span>Comandos de voz</span>
@@ -177,7 +181,7 @@
     <div id="confirmationOverlay" class="modal-overlay">
         <div id="confirmationModal" class="confirmation-modal">
             <h3><i class="fas fa-plus-circle"></i> Iniciar Nova Sessão</h3>
-            <p>Deseja iniciar uma nova conversa com o chatbot?</p>
+            <p>Tem certeza que deseja iniciar um novo atendimento? O atendimento atual será salvo no histórico.</p>
             <div class="confirmation-actions">
                 <button class="confirmation-button cancel-button" id="cancelNewSession">Cancelar</button>
                 <button class="confirmation-button confirm-button" id="confirmNewSession">Confirmar</button>
