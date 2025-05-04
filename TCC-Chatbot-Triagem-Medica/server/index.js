@@ -37,7 +37,9 @@ const openai = new OpenAI({
 });
 
 // Configuração do CORS - permitindo todas as origens
-app.use(cors());
+app.use(cors({
+  origin: 'https://tcc-chatbot-triagem-medica.vercel.app'
+}));
 
 // Middleware para logging
 app.use((req, res, next) => {
