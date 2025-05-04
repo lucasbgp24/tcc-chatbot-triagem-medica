@@ -98,7 +98,7 @@ function validateEmail(email) {
 // Função para acessar como convidado
 async function accessAsGuest() {
     try {
-        const response = await fetch(`/api/guest`, {
+        const response = await fetch('https://tcc-chatbot-triagem-medica.onrender.com/api/guest', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -136,7 +136,7 @@ async function handleLogin(event) {
     const password = passwordInput.value;
 
     try {
-        const response = await fetch(`/api/login`, {
+        const response = await fetch('https://tcc-chatbot-triagem-medica.onrender.com/api/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -190,7 +190,7 @@ async function handleRegister(event) {
     }
 
     try {
-        const response = await fetch(`/api/register`, {
+        const response = await fetch('https://tcc-chatbot-triagem-medica.onrender.com/api/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

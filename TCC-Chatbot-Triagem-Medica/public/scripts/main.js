@@ -1,5 +1,5 @@
 // Configuração inicial
-const SERVER_URL = 'http://localhost:3001';
+const SERVER_URL = 'https://tcc-chatbot-triagem-medica.onrender.com';
 
 // Verificação imediata de autenticação
 (function checkAuth() {

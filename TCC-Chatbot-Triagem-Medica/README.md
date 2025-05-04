@@ -1,4 +1,4 @@
-# Chatbot de Triagem Médica
+# TCC Chatbot Triagem Médica
 
 Este projeto consiste em um chatbot web para realizar triagem automatizada de sintomas, fornecendo orientações iniciais aos pacientes com base em seus relatos.
 
@@ -30,27 +30,51 @@ Este projeto consiste em um chatbot web para realizar triagem automatizada de si
 └── docs/            # Documentação do projeto
 ```
 
-## Instalação
+## 🛠️ Instalação das Dependências
 
-1. Clone o repositório
-2. Instale as dependências do servidor:
-   ```bash
-   cd server
-   npm install
-   ```
+Após clonar o projeto, instale as dependências do backend:
 
-3. Configure as variáveis de ambiente:
-   - Crie um arquivo `.env` no diretório server
-   - Adicione sua chave da API OpenAI
+```bash
+cd "TCC Chatbot Triagem Medica/server"
+npm install
+```
 
-4. Inicie o servidor:
-   ```bash
-   cd server
-   npm start
-   ```
+Se aparecerem erros de módulos não encontrados, instale-os manualmente:
 
-5. Abra o arquivo `public/index.html` em seu navegador
+```bash
+npm install jsonwebtoken
+npm install bcryptjs
+npm install mongodb
+npm install mongoose
+```
 
-## Contribuição
+## 🔑 Variáveis de Ambiente
+
+Crie um arquivo `.env` na pasta `server` e adicione as variáveis necessárias, por exemplo:
+
+```
+OPENAI_API_KEY=sua_chave_aqui
+# Outras variáveis necessárias, como string de conexão do MongoDB, etc.
+```
+
+## ▶️ Rodando o Projeto
+
+Para iniciar o servidor, utilize um dos comandos abaixo:
+
+```bash
+npm start
+# ou
+node index.js
+# ou
+iniciar.bat
+```
+
+> **Dica:** O arquivo `iniciar.bat` automatiza o processo de inicialização do servidor no Windows. Basta dar um duplo clique nele para rodar o backend sem precisar digitar comandos no terminal.
+
+## 💻 Rodando o Frontend
+
+Abra o arquivo `public/index.html` no navegador ou utilize uma extensão de servidor local (como Live Server no VSCode).
+
+## 🤝 Contribuição
 
 Este projeto está em desenvolvimento. Contribuições são bem-vindas! 
