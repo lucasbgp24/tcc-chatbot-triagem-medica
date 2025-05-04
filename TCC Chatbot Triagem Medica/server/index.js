@@ -18,11 +18,15 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Configuração do MongoDB
-const MONGODB_URI = 'mongodb://localhost:27017/triagem_medica';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/triagem_medica';
 
 // Conectar ao MongoDB
 mongoose.connect(MONGODB_URI).then(() => {
-    console.log('Conectado ao MongoDB local com sucesso');
+    if (MONGODB_URI.includes('mongodb+srv')) {
+        console.log('Conectado ao MongoDB Atlas com sucesso');
+    } else {
+        console.log('Conectado ao MongoDB local com sucesso');
+    }
 }).catch(err => {
     console.error('Erro ao conectar ao MongoDB:', err);
 });
