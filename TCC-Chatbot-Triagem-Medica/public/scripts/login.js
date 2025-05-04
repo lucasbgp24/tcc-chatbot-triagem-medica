@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    const SERVER_URL = 'http://localhost:3001';
+    const SERVER_URL = 'https://tcc-chatbot-triagem-medica.onrender.com';
     
     // Elementos do DOM
     const loginForm = document.getElementById('loginForm');
@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch('/api/register', {
+            const response = await fetch(`${SERVER_URL}/api/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
