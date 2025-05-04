@@ -136,47 +136,44 @@ app.post('/api/login', async (req, res) => {
 });
 
 // Prompt base para o chatbot
-const SYSTEM_PROMPT = `Você é um assistente de triagem médica especializado em avaliar sintomas iniciais e fornecer orientações preliminares. Mantenha um tom acolhedor e profissional, demonstrando empatia com o paciente.
+const SYSTEM_PROMPT = `Você é um assistente de triagem médica especializado em avaliar sintomas iniciais e fornecer orientações preliminares.
 
-PERSONALIDADE:
-- Seja acolhedor e empático, mas mantenha o profissionalismo
-- Responda cumprimentos de forma educada e breve antes de focar na triagem
-- Use linguagem clara e acessível
-- Demonstre interesse genuíno pelo bem-estar do paciente
-
-REGRAS IMPORTANTES:
-1. Mantenha o foco em triagem médica e avaliação de sintomas
-2. Faça perguntas específicas sobre os sintomas relatados
-3. Colete informações importantes como:
-   - Duração dos sintomas
-   - Intensidade
-   - Fatores que pioram ou melhoram
-   - Sintomas associados
-   - Histórico médico relevante
-4. Forneça orientações preliminares claras
-5. Sempre alerte sobre sinais de emergência
-6. Indique quando buscar atendimento médico presencial
+REGRAS DE COMUNICAÇÃO:
+1. NÃO repita saudações se já houver uma conversa em andamento
+2. Mantenha o contexto da conversa atual
+3. Referencie informações já mencionadas
+4. Seja direto e objetivo nas perguntas
+5. Use linguagem clara e acessível
+6. Demonstre empatia de forma profissional
 
 ESTRUTURA DE RESPOSTA:
-1. Se o usuário apenas cumprimentar:
-   - Responda o cumprimento brevemente
-   - Pergunte gentilmente como pode ajudar com questões de saúde
-2. Se o usuário mencionar sintomas:
+1. Se for a primeira mensagem do usuário:
+   - Faça uma saudação breve e profissional
+   - Pergunte sobre os sintomas principais
+2. Se já estiver em uma conversa:
+   - Continue o diálogo sem repetir saudações
+   - Faça perguntas complementares baseadas no contexto
+   - Referencie informações já mencionadas
+3. Se o usuário mencionar sintomas:
    - Demonstre que entendeu a queixa
    - Faça perguntas específicas sobre os sintomas
    - Avalie a gravidade
    - Forneça orientações preliminares
-   - Indique se é necessário buscar atendimento médico
+
+COLETA DE INFORMAÇÕES:
+1. Duração dos sintomas
+2. Intensidade
+3. Fatores que pioram ou melhoram
+4. Sintomas associados
+5. Histórico médico relevante
 
 IMPORTANTE:
-- Em caso de sintomas graves ou emergenciais, oriente a buscar atendimento imediato
-- Mantenha um tom profissional mas acolhedor
+- Em caso de sintomas graves, oriente buscar atendimento imediato
 - Não faça diagnósticos definitivos
 - Não prescreva medicamentos
 - Sempre reforce que é uma triagem inicial
-- Use emojis ocasionalmente para tornar a comunicação mais amigável (🩺, ✨, 👋, etc)
 
-Em caso de emergência, instrua o paciente a ligar para:
+NÚMEROS DE EMERGÊNCIA:
 - SAMU: 192
 - Bombeiros: 193`;
 
@@ -185,6 +182,9 @@ async function getChatGPTResponse(message, conversationHistory) {
     try {
         // Mantém apenas as últimas 10 mensagens para contexto
         const recentMessages = conversationHistory.slice(-10);
+        
+        // Verifica se é a primeira mensagem
+        const isFirstMessage = recentMessages.length === 0;
         
         const completion = await openai.chat.completions.create({
             model: "gpt-3.5-turbo",
@@ -227,12 +227,6 @@ async function getChatGPTResponse(message, conversationHistory) {
         return response;
     } catch (error) {
         console.error('Erro ao usar OpenAI:', error);
-        
-        // Se for erro de limite de requisições, retorna mensagem simulada
-        if (error.code === 'rate_limit_exceeded') {
-            return getSimulatedResponse(message);
-        }
-        
         throw error;
     }
 }
@@ -604,11 +598,14 @@ app.get('/api/health', (req, res) => {
 // Rota de chat
 app.post('/api/chat', async (req, res) => {
     try {
-        const { message, isGuest } = req.body;
+        const { message, isGuest, conversationHistory } = req.body;
         
         if (!message) {
             return res.status(400).json({ error: 'Mensagem não fornecida' });
         }
+
+        let userId = null;
+        let userContext = '';
 
         // Se não for convidado, verifica o token
         if (!isGuest) {
@@ -619,14 +616,44 @@ app.post('/api/chat', async (req, res) => {
 
             try {
                 const decoded = jwt.verify(token, process.env.JWT_SECRET || 'sua_chave_secreta');
-                req.userId = decoded.id;
+                userId = decoded.id;
+                const user = await User.findById(userId);
+                
+                if (user) {
+                    userContext = `
+INFORMAÇÕES DO PACIENTE:
+- Nome: ${user.fullName}
+- Data de Nascimento: ${user.birthDate}
+${user.gender ? `- Gênero: ${user.gender}` : ''}
+${user.conditions ? `- Condições Médicas: ${user.conditions}` : ''}
+${user.allergies ? `- Alergias: ${user.allergies}` : ''}`;
+                }
             } catch (error) {
                 return res.status(401).json({ error: 'Token inválido' });
             }
         }
 
         // Obtém resposta do ChatGPT
-        const response = await getChatGPTResponse(message, []);
+        const response = await getChatGPTResponse(message, conversationHistory || []);
+        
+        // Se o usuário estiver autenticado, salva o histórico
+        if (userId) {
+            try {
+                const chatHistory = new ChatHistory({
+                    userId,
+                    symptoms: message,
+                    severity: 'Baixa Gravidade',
+                    conversation: [
+                        ...(conversationHistory || []),
+                        { role: 'user', content: message },
+                        { role: 'assistant', content: response }
+                    ]
+                });
+                await chatHistory.save();
+            } catch (error) {
+                console.error('Erro ao salvar histórico:', error);
+            }
+        }
         
         res.json({ message: response });
     } catch (error) {
