@@ -18,22 +18,22 @@
                 <p>Faça login para acessar o sistema</p>
             </div>
 
-            <form class="login-form">
+            <form id="loginForm" class="login-form">
                 <div class="form-group">
-                    <label for="email">
+                    <label for="loginEmail">
                         <i class="fas fa-envelope"></i>
                         Email
                     </label>
-                    <input type="email" id="email" required>
+                    <input type="email" id="loginEmail" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="password">
+                    <label for="loginPassword">
                         <i class="fas fa-lock"></i>
                         Senha
                     </label>
                     <div class="password-input">
-                        <input type="password" id="password" required>
+                        <input type="password" id="loginPassword" required>
                         <button type="button" class="toggle-password">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -42,7 +42,7 @@
 
                 <div class="form-group">
                     <label class="checkbox-container">
-                        <input type="checkbox" id="remember">
+                        <input type="checkbox" id="rememberMe">
                         Lembrar de mim
                     </label>
                 </div>
@@ -52,7 +52,7 @@
                     Entrar
                 </button>
 
-                <button type="button" class="guest-button" onclick="accessAsGuest()">
+                <button type="button" id="guestAccess" class="guest-button">
                     <i class="fas fa-user-secret"></i>
                     Continuar sem conta
                 </button>
@@ -67,14 +67,14 @@
     <!-- Modal de Registro -->
     <div class="modal" id="registerModal">
         <div class="modal-content">
-            <button class="close-button" id="closeRegister">&times;</button>
+            <button class="close-button close">&times;</button>
             <div class="modal-header">
                 <i class="fas fa-user-plus"></i>
                 <h1>Criar Conta</h1>
                 <p>Preencha os dados para se registrar</p>
             </div>
             
-            <form class="register-form" id="registerForm">
+            <form id="registerForm">
                 <div class="form-group">
                     <label for="fullName">
                         <i class="fas fa-user"></i>
@@ -146,7 +146,7 @@
                         <i class="fas fa-user-plus"></i>
                         Registrar
                     </button>
-                    <button type="button" class="cancel-button" onclick="closeRegisterModal()">
+                    <button type="button" class="cancel-button">
                         Cancelar
                     </button>
                 </div>
@@ -154,6 +154,6 @@
         </div>
     </div>
 
-    <script src="scripts/auth.js"></script>
+    <script src="scripts/login.js"></script>
 </body>
 </html> 

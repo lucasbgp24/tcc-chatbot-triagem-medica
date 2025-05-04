@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM carregado, iniciando script de login...');
+
     // Verifica se está na página de login
     if (!window.location.pathname.includes('login.html')) {
+        console.log('Não está na página de login, retornando...');
         return;
     }
 
@@ -8,9 +11,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const authToken = localStorage.getItem('authToken');
     const isGuest = localStorage.getItem('guestMode') === 'true';
     
+    console.log('Verificando autenticação:', { authToken: !!authToken, isGuest });
+
     // Se já estiver autenticado ou em modo convidado, redireciona
     if (authToken || isGuest) {
-        window.location.replace('index.html');
+        const userName = localStorage.getItem('userName') || 'Usuário';
+        console.log('Usuário já autenticado, redirecionando...', { userName });
+        
+        // Força a criação do toast antes do redirecionamento
+        const toast = showToast(`Bem-vindo(a) de volta, ${userName}!`, 'success');
+        document.body.appendChild(toast);
+        
+        // Aguarda um momento para garantir que o toast seja exibido
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 1500);
         return;
     }
 
@@ -29,21 +44,56 @@ document.addEventListener('DOMContentLoaded', () => {
     const rememberMeCheckbox = document.getElementById('rememberMe');
     const guestAccessBtn = document.getElementById('guestAccess');
 
+    // Log para debug dos elementos encontrados
+    console.log('Elementos encontrados:', {
+        loginForm: !!loginForm,
+        guestAccessBtn: !!guestAccessBtn,
+        registerForm: !!registerForm
+    });
+
     // Funções auxiliares
-    const showToast = (message, type) => {
+    const showToast = (message, type, isLoading = false) => {
+        console.log('Criando toast:', { message, type, isLoading });
+        
+        // Remove qualquer toast existente
+        const existingToasts = document.querySelectorAll('.toast');
+        existingToasts.forEach(toast => toast.remove());
+
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         toast.textContent = message;
+        
+        // Adiciona o ícone apropriado
+        const icon = document.createElement('i');
+        if (isLoading) {
+            icon.className = 'fas fa-spinner fa-spin';
+        } else if (type === 'success') {
+            icon.className = 'fas fa-check-circle';
+        } else if (type === 'error') {
+            icon.className = 'fas fa-exclamation-circle';
+        } else if (type === 'info') {
+            icon.className = 'fas fa-info-circle';
+        }
+        toast.insertBefore(icon, toast.firstChild);
+
+        // Força a renderização do toast
         document.body.appendChild(toast);
+        toast.offsetHeight; // Força um reflow
         
-        // Força um reflow para garantir que a animação funcione
-        toast.offsetHeight;
-        
-        toast.classList.add('show');
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
+        // Adiciona a classe show após um pequeno delay
+        requestAnimationFrame(() => {
+            toast.classList.add('show');
+        });
+
+        if (!isLoading) {
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        console.log('Toast criado:', toast);
+        return toast;
     };
 
     const validateEmail = (email) => {
@@ -99,67 +149,85 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Login Form Submit
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
-        const rememberMe = document.getElementById('rememberMe').checked;
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            console.log('Form de login submetido');
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
 
-        if (!validateEmail(email)) {
-            showToast('Por favor, insira um email válido', 'error');
-            return;
-        }
-
-        if (!validatePassword(password)) {
-            showToast('A senha deve ter pelo menos 6 caracteres', 'error');
-            return;
-        }
-
-        try {
-            const response = await fetch(`${SERVER_URL}/api/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email, password })
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                // Salva o token
-                localStorage.setItem('authToken', data.token);
-                
-                // Salva o nome do usuário
-                if (data.user && data.user.fullName) {
-                    localStorage.setItem('userName', data.user.fullName);
-                }
-                
-                // Se marcou "lembrar-me", salva o email
-                if (rememberMe) {
-                    localStorage.setItem('userEmail', email);
-                } else {
-                    localStorage.removeItem('userEmail');
-                }
-
-                // Remove modo convidado se estiver ativo
-                localStorage.removeItem('guestMode');
-
-                showToast('Login realizado com sucesso!', 'success');
-                
-                // Redireciona após um breve delay
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1000);
-            } else {
-                showToast(data.error || 'Erro ao fazer login', 'error');
+            if (!validateEmail(email)) {
+                showToast('Por favor, insira um email válido', 'error');
+                return;
             }
-        } catch (error) {
-            console.error('Erro:', error);
-            showToast('Erro ao conectar ao servidor', 'error');
-        }
-    });
+
+            if (!validatePassword(password)) {
+                showToast('A senha deve ter pelo menos 6 caracteres', 'error');
+                return;
+            }
+
+            try {
+                // Desabilita o botão de login
+                const submitButton = loginForm.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                
+                // Mostra mensagem de carregamento
+                const loadingToast = showToast('Verificando credenciais...', 'info', true);
+
+                const response = await fetch(`${SERVER_URL}/api/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                console.log('Resposta do servidor:', data);
+
+                // Remove o toast de carregamento
+                loadingToast.remove();
+
+                if (response.ok) {
+                    // Salva o token
+                    localStorage.setItem('authToken', data.token);
+                    
+                    // Salva o nome do usuário
+                    if (data.user && data.user.fullName) {
+                        localStorage.setItem('userName', data.user.fullName);
+                    }
+                    
+                    // Se marcou "lembrar-me", salva o email
+                    if (rememberMe) {
+                        localStorage.setItem('userEmail', email);
+                    } else {
+                        localStorage.removeItem('userEmail');
+                    }
+
+                    // Remove modo convidado se estiver ativo
+                    localStorage.removeItem('guestMode');
+
+                    // Mostra mensagem de sucesso com o nome do usuário
+                    const userName = data.user.fullName.split(' ')[0];
+                    const successToast = showToast(`Bem-vindo(a), ${userName}!`, 'success');
+                    
+                    // Aguarda o toast ser exibido antes de redirecionar
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                } else {
+                    showToast(data.error || 'Email ou senha incorretos', 'error');
+                    submitButton.disabled = false;
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao conectar ao servidor. Verifique sua conexão.', 'error');
+                submitButton.disabled = false;
+            }
+        });
+    }
 
     // Register Form Submit
     registerForm.addEventListener('submit', async (e) => {
@@ -237,42 +305,62 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Acesso como convidado
-    guestAccessBtn.addEventListener('click', async () => {
-        try {
-            const response = await fetch(`${SERVER_URL}/api/guest`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                // Configura o modo convidado
-                localStorage.setItem('guestMode', 'true');
-                localStorage.removeItem('authToken'); // Remove token se existir
-                localStorage.setItem('userName', 'Convidado');
-
-                showToast('Entrando como convidado...', 'success');
+    if (guestAccessBtn) {
+        guestAccessBtn.addEventListener('click', async () => {
+            console.log('Botão de acesso como convidado clicado');
+            try {
+                // Desabilita o botão de convidado
+                guestAccessBtn.disabled = true;
                 
-                // Redireciona após um breve delay
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1000);
-            } else {
-                showToast(data.message || 'Erro ao acessar como convidado', 'error');
+                // Mostra mensagem de carregamento
+                const loadingToast = showToast('Iniciando modo convidado...', 'info', true);
+
+                const response = await fetch(`${SERVER_URL}/api/guest`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                console.log('Resposta do servidor (modo convidado):', data);
+
+                // Remove o toast de carregamento
+                loadingToast.remove();
+
+                if (response.ok) {
+                    // Configura o modo convidado
+                    localStorage.setItem('guestMode', 'true');
+                    localStorage.removeItem('authToken');
+                    localStorage.setItem('userName', 'Convidado');
+
+                    showToast('Entrando como convidado...', 'success');
+                    
+                    // Redireciona após um delay
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                } else {
+                    showToast(data.message || 'Erro ao acessar como convidado', 'error');
+                    guestAccessBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao conectar ao servidor. Verifique sua conexão.', 'error');
+                guestAccessBtn.disabled = false;
             }
-        } catch (error) {
-            console.error('Erro:', error);
-            showToast('Erro ao conectar ao servidor', 'error');
-        }
-    });
+        });
+    }
 
     // Verificar se há email salvo
     const savedEmail = localStorage.getItem('userEmail');
-    if (savedEmail) {
-        document.getElementById('loginEmail').value = savedEmail;
-        rememberMeCheckbox.checked = true;
+    if (savedEmail && loginForm) {
+        const emailInput = document.getElementById('loginEmail');
+        if (emailInput) {
+            emailInput.value = savedEmail;
+            if (rememberMeCheckbox) {
+                rememberMeCheckbox.checked = true;
+            }
+        }
     }
 }); 
