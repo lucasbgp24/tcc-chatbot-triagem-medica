@@ -1,0 +1,418 @@
+﻿INSTITUTO FEDERAL DE EDUCAÇÃO, CIÊNCIA E TECNOLOGIA DE SÃO PAULO
+Câmpus Campinas
+
+
+
+
+Curso de Tecnologia em
+Análise e Desenvolvimento de Sistemas
+
+
+
+
+A nova era da Inteligência Artificial Desenvolvimento de um Chatbot para Triagem Automatizada de Sintomas
+
+
+Autor: Lucas Oliveira Cavalcanti de Sousa
+Orientador: Prof. José Americo dos Santos Mendonça
+
+
+
+
+CAMPINAS
+2024
+________________
+
+
+Autor: Lucas Oliveira Cavalcanti de Sousa
+Orientador: Prof. José Americo dos Santos Mendonça
+
+
+
+
+
+
+
+
+
+
+A nova era da Inteligência Artificial         Desenvolvimento de um Chatbot para Triagem Automatizada de Sintomas
+
+
+
+
+
+
+Plano Inicial de Atividades de Trabalho de Conclusão de Curso de em Análise e Desenvolvimento de Sistemas do Instituto Federal de São Paulo, Câmpus Campinas, como requisito parcial para a aprovação na disciplina de Projeto de Sistemas I.
+
+
+
+
+
+
+
+
+
+
+
+
+CAMPINAS
+2024
+________________
+Sumário
+        
+1        Introdução        4
+2        Justificativa        5
+3        Objetivos        6
+3.1        Objetivo Geral        6
+3.2        Objetivos Específicos        6
+4        Fundamentação Teórica        7
+4.1        Inteligência Artificial e Processamento de Linguagem Natural (PLN)        7
+4.2        Chatbots na Saúde        7
+4.3        Triagem Automatizada e Desafios na Saúde Digital        8
+5        Metodologia        9
+5.1        Levantamento Bibliográfico        9
+5.2        Projeto        9
+5.3        Implementação        9
+5.4        Testes e Validação        10
+5.5        Avaliação dos Resultados        10
+6        Cronograma        11
+7        Bibliografia        12
+
+
+
+
+
+
+
+
+
+
+
+
+1. Introdução
+
+
+A evolução da tecnologia, especialmente no campo da Inteligência Artificial (IA), tem promovido grandes avanços em diversas áreas, incluindo a saúde. A automação de processos e a criação de ferramentas inteligentes são estratégias promissoras para melhorar o atendimento médico, especialmente em sistemas de saúde sobrecarregados. Este trabalho propõe o desenvolvimento de um chatbot para realizar a triagem automatizada de sintomas, utilizando IA para fornecer orientações iniciais aos pacientes antes de uma consulta presencial. A área de aplicação é voltada para saúde primária, onde a triagem pode auxiliar na eficiência do atendimento, reduzindo o tempo de espera e otimizando o diagnóstico preliminar.
+O estudo é motivado pela crescente demanda por soluções que possam melhorar a acessibilidade aos cuidados de saúde e desafogar os sistemas de emergência, que frequentemente recebem pacientes com sintomas que poderiam ser inicialmente tratados ou avaliados em unidades básicas. Além disso, a pandemia de COVID-19 destacou a importância de ferramentas digitais para apoio à saúde à distância, reforçando a relevância de soluções tecnológicas nesse contexto.
+O problema central abordado neste trabalho é a dificuldade de realização de uma triagem inicial eficaz e rápida de sintomas em grande escala, o que pode levar ao atraso no diagnóstico e tratamento. Pacientes frequentemente recorrem a emergências por falta de orientação adequada, o que agrava a sobrecarga dos serviços.
+O objetivo deste projeto é desenvolver um chatbot capaz de realizar a triagem de sintomas com base em perguntas simples, sugerindo orientações preliminares, como necessidade de procurar atendimento médico imediato ou se o paciente pode continuar monitorando em casa. A meta é auxiliar na redução de consultas desnecessárias e encaminhar corretamente os pacientes que necessitam de atenção imediata.
+A avaliação dos resultados será feita com base em simulações de casos clínicos comuns e na análise da precisão das recomendações fornecidas pelo chatbot, comparando-as com diretrizes de saúde estabelecidas. Pretende-se também verificar a usabilidade da ferramenta por meio de testes com usuários simulados, focando na clareza das orientações e na experiência do usuário.
+2. Justificativa
+
+
+A triagem adequada de sintomas é um elemento essencial para garantir um fluxo eficiente nos sistemas de saúde. No entanto, é comum que pacientes procurem serviços de emergência para condições que poderiam ser tratadas em unidades básicas ou monitoradas em casa, o que sobrecarrega o atendimento e atrasa o diagnóstico de casos mais graves. Nesse contexto, a aplicação de tecnologias baseadas em Inteligência Artificial (IA) pode trazer avanços significativos, permitindo maior eficiência e acessibilidade no atendimento inicial.
+A escolha deste tema é motivada pela necessidade crescente de soluções tecnológicas na saúde, especialmente no cenário pós-pandemia, em que a telemedicina e ferramentas digitais se consolidaram como alternativas fundamentais. A investigação sobre o uso de chatbots para a triagem automatizada busca preencher uma lacuna relevante, oferecendo uma abordagem prática e inovadora que pode ajudar a desafogar serviços de emergência e orientar corretamente os pacientes.
+Do ponto de vista social, o projeto é relevante porque contribui para a democratização do acesso à saúde, fornecendo orientações iniciais rápidas e precisas para todos os perfis de pacientes. Já no aspecto acadêmico e científico, este trabalho busca explorar a integração entre IA e saúde, alinhando-se a uma tendência crescente de pesquisas que investigam o uso de algoritmos inteligentes para melhorar a eficiência dos serviços médicos.
+Além disso, a proposta se destaca pela contribuição incremental: ao desenvolver um chatbot com foco na triagem inicial, pretende-se reduzir consultas desnecessárias e otimizar a distribuição de recursos nos serviços de saúde. Dessa forma, o trabalho apresenta não apenas valor prático imediato, mas também potencial para ser expandido e adaptado a diferentes contextos clínicos no futuro.
+Por fim, este estudo busca validar a eficácia do chatbot por meio de simulações de casos clínicos, avaliando sua capacidade de orientar corretamente os pacientes e contribuir para uma melhor gestão dos fluxos de atendimento.
+
+
+3. Objetivos
+
+
+   1. Objetivo Geral 
+ Desenvolver um chatbot capaz de realizar a triagem automatizada de sintomas, fornecendo orientações iniciais aos pacientes com base em seus relatos, a fim de otimizar o fluxo de atendimento nos serviços de saúde e reduzir a sobrecarga em unidades de emergência. 
+
+
+   2. Objetivos Específicos 
+ Identificar os sintomas mais comuns que possam ser abordados em uma triagem automatizada;
+Desenvolver fluxos de conversação para o chatbot, baseados em orientações médicas pré-estabelecidas;
+Implementar um protótipo funcional do chatbot utilizando ferramentas de IA e processamento de linguagem natural;
+Validar o chatbot por meio de simulações de casos clínicos, verificando a eficácia e precisão das orientações fornecidas;
+Avaliar a usabilidade do chatbot com base em testes com usuários simulados, garantindo clareza e acessibilidade nas respostas.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4. Fundamentação Teórica
+
+
+   3. Inteligência Artificial e Processamento de Linguagem Natural (PLN)
+
+
+A Inteligência Artificial (IA) é uma área da computação que busca desenvolver sistemas capazes de executar tarefas que normalmente exigem inteligência humana, como aprendizado, tomada de decisões e compreensão de linguagem. Dentre suas aplicações, o Processamento de Linguagem Natural (PLN) se destaca por permitir que máquinas compreendam, interpretem e gerem linguagem humana de forma eficiente (RUSSELL; NORVIG, 2016). 
+
+Os modelos de linguagem avançados, como o GPT-3.5 da OpenAI, representam um avanço significativo no campo do PLN, oferecendo capacidades sofisticadas de compreensão e geração de texto. Esses modelos são treinados com grandes volumes de dados e podem ser fine-tuned para aplicações específicas, como a triagem médica.
+
+A integração desses modelos com aplicações web modernas permite criar interfaces intuitivas e responsivas, onde o usuário pode interagir naturalmente com o sistema. O uso de tecnologias web como HTML5, CSS3 e JavaScript, combinadas com frameworks como Node.js, possibilita o desenvolvimento de aplicações robustas e escaláveis.
+
+   4. Chatbots na Saúde
+
+O uso de chatbots em sistemas de saúde tem crescido significativamente, especialmente para triagem de sintomas e telemedicina. A evolução das tecnologias web e da IA tem permitido o desenvolvimento de interfaces mais sofisticadas e naturais para interação com os pacientes.
+
+Os chatbots modernos podem ser implementados como aplicações web responsivas, oferecendo uma experiência consistente em diferentes dispositivos. Recursos como reconhecimento de voz, temas personalizáveis e interfaces adaptativas tornam a interação mais acessível e amigável para os usuários.
+
+A arquitetura cliente-servidor, utilizando Node.js e Express no backend, permite uma comunicação eficiente entre o frontend e os serviços de IA, garantindo respostas rápidas e confiáveis. Além disso, o armazenamento local permite manter o histórico de conversas e oferecer um modo offline com respostas pré-definidas para situações comuns.
+
+   5. Triagem Automatizada e Desafios na Saúde Digital
+
+
+A triagem automatizada consiste na coleta e análise inicial de sintomas relatados pelo paciente, auxiliando na identificação de casos urgentes e evitando atendimentos desnecessários. Este processo é especialmente relevante para sistemas de saúde pública e emergências, onde a sobrecarga de pacientes pode comprometer a eficiência do serviço (PEREIRA; SOUZA, 2020). A literatura destaca, porém, que a implementação de chatbots na saúde apresenta desafios relacionados à privacidade de dados e à aceitação por parte dos pacientes, sendo necessária uma avaliação rigorosa da usabilidade e eficácia da solução proposta (RUBIN; SMITH, 2021).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+5. Metodologia
+
+
+Este trabalho foi elaborado nas seguintes fases:
+1. Levantamento Bibliográfico;
+2. Projeto;
+3. Implementação;
+4. Testes e Validação;
+5. Avaliação dos Resultados.
+
+
+   6. Levantamento Bibliográfico
+Nesta etapa, será realizada uma pesquisa de artigos científicos, livros e materiais sobre inteligência artificial aplicada à saúde, processamento de linguagem natural (PLN), e triagem de sintomas por meio de chatbots. Esse levantamento fornecerá a base teórica para o desenvolvimento do projeto e auxiliará na escolha das melhores práticas e ferramentas.
+
+
+   7. Projeto
+Será definido o escopo do chatbot e os recursos necessários para sua implementação.
+* Frontend: HTML5, CSS3 e JavaScript puro para interface web responsiva
+* Backend: Node.js com Express para API REST
+* IA: OpenAI GPT-3.5 para processamento de linguagem natural
+* Banco de Dados: Armazenamento local para histórico de conversas
+* Outros Recursos: 
+  - FontAwesome para ícones
+  - Sistema de temas claro/escuro
+  - Reconhecimento de voz para entrada de texto
+  - Interface adaptativa para mobile
+
+   1. Implementação
+Nesta fase, será desenvolvida a estrutura do chatbot, incluindo:
+* Desenvolvimento de interface web responsiva e intuitiva
+* Implementação de API REST com Node.js e Express
+* Integração com OpenAI GPT-3.5 para processamento de linguagem natural
+* Sistema de triagem com níveis de gravidade (baixo, médio, alto)
+* Funcionalidades implementadas:
+  - Chat em tempo real
+  - Reconhecimento de voz
+  - Modo offline com respostas pré-definidas
+  - Sistema de emergência
+  - Histórico de conversas
+  - Temas claro/escuro
+  - Interface adaptativa para mobile
+  - Botões de sintomas rápidos
+  - Indicadores visuais de gravidade
+  - Sistema de inatividade
+
+   2. Testes e Validação 
+Serão realizadas simulações de casos clínicos comuns para avaliar a precisão das orientações fornecidas pelo chatbot.
+* Testes de interface em diferentes dispositivos
+* Validação do sistema de triagem e níveis de gravidade
+* Testes do modo offline e respostas pré-definidas
+* Avaliação da usabilidade e experiência do usuário
+* Testes de performance e tempo de resposta
+* Validação do sistema de emergência
+* Testes de acessibilidade
+
+   3. Avaliação dos Resultados
+A análise dos resultados será feita com base na precisão das recomendações e na usabilidade do chatbot. Os seguintes critérios serão avaliados:
+* Precisão: Avaliação das respostas do GPT-3.5 e modo offline
+* Usabilidade: Interface intuitiva e responsiva
+* Acessibilidade: Suporte a diferentes dispositivos e necessidades
+* Performance: Tempo de resposta e eficiência
+* Confiabilidade: Sistema de fallback e emergência
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+6. Cronograma
+
+
+O cronograma a seguir apresenta a distribuição das atividades ao longo do período previsto para o desenvolvimento deste projeto. Cada etapa foi planejada para garantir um fluxo contínuo e organizado, com tempo suficiente para ajustes e revisões. O desenvolvimento do chatbot e a avaliação de seus resultados seguirão um processo iterativo, permitindo que cada fase contribua para a melhoria do trabalho final.
+
+Atividade
+	Mês 1
+	Mês 2
+	Mês 3
+	Mês 4
+	Mês 5
+	Mês 6
+	Mês 7
+	Mês 8
+	Mês 9
+	Mês 10
+	Mês 11
+	Mês 12
+	Levantamento Bibliográfico
+	X
+	X
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	Projeto
+	 
+	X
+	X
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	Implementação
+	 
+	 
+	X
+	X
+	X
+	X
+	 
+	 
+	 
+	 
+	 
+	Testes e Validação
+	 
+	 
+	 
+	 
+	X
+	X
+	X
+	 
+	 
+	 
+	 
+	Avaliação dos Resultados
+	 
+	 
+	 
+	 
+	 
+	X
+	X
+	X
+	 
+	 
+	 
+	Revisão e Ajustes
+	 
+	 
+	 
+	 
+	 
+	 
+	X
+	X
+	X
+	X
+	X
+	 
+	Redação Final e Defesa
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+	X
+	X
+	X
+	X
+	X
+
+7. Bibliografia
+
+
+JURAFSKY, Daniel; MARTIN, James H. Speech and Language Processing: An Introduction to Natural Language Processing, Computational Linguistics, and Speech Recognition. 3. ed. New Jersey: Prentice Hall, 2019.
+KASS-HOUT, Taha; ALHABASHI, Haytham. Artificial Intelligence in Health: Current Applications and Future Directions. Journal of Medical Systems, v. 46, n. 1, 2022.
+PEREIRA, João C.; SOUZA, Amanda F. Aplicação de Chatbots no Atendimento em Saúde: Uma Revisão Sistemática da Literatura. Revista Brasileira de Saúde Digital, v. 5, n. 2, p. 55-70, 2020.
+RUBIN, Renée; SMITH, Alan. Privacy and Ethics in AI-based Health Applications: Opportunities and Challenges. Health Technology, v. 11, n. 3, p. 325-337, 2021.
+RUSSELL, Stuart J.; NORVIG, Peter. Artificial Intelligence: A Modern Approach. 4th Edition. Pearson, 2020.
+
+BROWN, Tom et al. Language Models are Few-Shot Learners. arXiv:2005.14165, 2020.
+
+CHOWDHURY, Monjur M. Natural Language Processing. Annual Review of Information Science and Technology, v. 37, n. 1, p. 51-89, 2003.
+
+DEVRIES, Zachary; PATEL, Vimla L. At the Intersection of Health, Communication and Data Mining: Digital Health Communication. Digital Health, v. 5, p. 1-24, 2019.
+
+FADEL, Luciano M. et al. Chatbots na Saúde: Uma Revisão Sistemática. Revista Brasileira de Informática na Educação, v. 28, p. 1-20, 2020.
+
+GOLDSTEIN, Daniel G. et al. The Effect of AI on Healthcare: A Systematic Review. Journal of Medical Internet Research, v. 22, n. 11, 2020.
+
+GOODFELLOW, Ian; BENGIO, Yoshua; COURVILLE, Aaron. Deep Learning. MIT Press, 2016.
+
+HARARI, Yuval Noah. 21 Lições para o Século 21. Companhia das Letras, 2018.
+
+KAPLAN, Jerry. Artificial Intelligence: What Everyone Needs to Know. Oxford University Press, 2016.
+
+LEVINE, David M. et al. The Quality of Patient Engagement in Primary Care: Patient and Practice Perspectives. The Annals of Family Medicine, v. 18, n. 1, p. 21-29, 2020.
+
+MCCANDLISH, Sam et al. An Empirical Model of Large-Batch Training. arXiv:1812.06162, 2018.
+
+MORAVEC, Hans. Mind Children: The Future of Robot and Human Intelligence. Harvard University Press, 1988.
+
+OPENAI. GPT-3.5: Language Models are Few-Shot Learners. OpenAI Blog, 2020.
+
+PEREIRA, Ana Carolina et al. Inteligência Artificial na Saúde: Oportunidades e Desafios. Revista Brasileira de Saúde Digital, v. 5, n. 2, p. 55-70, 2020.
+
+SUTTON, Richard S.; BARTO, Andrew G. Reinforcement Learning: An Introduction. 2nd Edition. MIT Press, 2018.
+
+TURING, Alan M. Computing Machinery and Intelligence. Mind, v. 59, n. 236, p. 433-460, 1950.
+
+VASWANI, Ashish et al. Attention is All You Need. arXiv:1706.03762, 2017.
+
+WANG, Yuxuan et al. A Survey on Natural Language Processing for Healthcare. arXiv:2101.00190, 2021.
+
+ZHAO, Wayne Xin et al. A Survey of Large Language Models. arXiv:2303.18223, 2023.
+
+
+                
+‌

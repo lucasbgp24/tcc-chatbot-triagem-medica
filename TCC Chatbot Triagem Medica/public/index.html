@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2196F3">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Chatbot de Triagem Médica</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- jsPDF para exportação de PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // Verificação imediata de autenticação
+        (function() {
+            const isGuest = localStorage.getItem('guestMode') === 'true';
+            const hasToken = localStorage.getItem('authToken');
+            if (!isGuest && !hasToken) {
+                window.location.replace('login.html');
+            }
+        })();
+    </script>
+</head>
+<body>
+    <!-- Barra de Progresso -->
+    <div class="progress-container">
+        <div class="progress-bar" id="triageProgress"></div>
+    </div>
+
+    <div class="container">
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="connection-status">
+                    <i class="fas fa-circle"></i>
+                    <span>Conectado</span>
+                </div>
+                
+                <div class="chat-header-content">
+                    <h1>Chatbot de Triagem Médica</h1>
+                    <p>Descreva seus sintomas e receba orientações iniciais</p>
+                </div>
+
+                <!-- Menu de botões -->
+                <div class="header-buttons" id="headerButtons">
+                    <button class="theme-toggle" aria-label="Alternar tema">
+                        <i class="fas fa-sun"></i>
+                        <span>Tema</span>
+                    </button>
+                    <button class="accessibility-toggle" id="accessibilityToggle" aria-label="Opções de acessibilidade">
+                        <i class="fas fa-universal-access"></i>
+                        <span>Acessibilidade</span>
+                    </button>
+                    <button class="history-toggle" title="Faça login para acessar seu histórico">
+                        <i class="fas fa-history"></i>
+                        <span>Histórico</span>
+                    </button>
+                    <button class="clear-button" id="newSessionButton" aria-label="Novo atendimento">
+                        <i class="fas fa-plus"></i>
+                        <span>Novo</span>
+                    </button>
+                    <button class="emergency-menu-button" aria-label="Emergência">
+                        <i class="fas fa-phone"></i>
+                        <span>Emergência</span>
+                    </button>
+                    <button class="logout-button" onclick="handleLogout()" aria-label="Sair">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Sair</span>
+                    </button>
+                </div>
+
+                <!-- Botão do menu mobile -->
+                <button class="menu-mobile">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <!-- Overlay do menu -->
+                <div class="menu-overlay" id="menuOverlay"></div>
+            </div>
+            <div class="chat-messages"></div>
+            <div class="chat-input-container">
+                <input type="text" 
+                       class="chat-input" 
+                       placeholder="Descreva seus sintomas aqui..." 
+                       aria-label="Digite sua mensagem"
+                       autocomplete="off"
+                       autocapitalize="sentences">
+                <button class="voice-button" aria-label="Usar voz">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <button class="send-button" aria-label="Enviar mensagem">Enviar</button>
+            </div>
+            <div class="emergency-notice">
+                Este é um sistema de triagem inicial.
+            </div>
+        </div>
+    </div>
+
+    <!-- Painel de Emergência -->
+    <div class="emergency-panel" id="emergencyPanel">
+        <h3>
+            <i class="fas fa-exclamation-triangle"></i> 
+            Contatos de Emergência
+            <button class="close-button" aria-label="Fechar painel de emergência">
+                <i class="fas fa-times"></i>
+            </button>
+        </h3>
+        <div class="emergency-contacts">
+            <a href="tel:192" class="emergency-contact">
+                <i class="fas fa-ambulance"></i>
+                <div class="contact-info">
+                    <div class="contact-name">SAMU</div>
+                    <div class="contact-number">192</div>
+                    <div class="contact-description">Atendimento móvel de urgência</div>
+                </div>
+            </a>
+            <a href="tel:193" class="emergency-contact">
+                <i class="fas fa-fire-extinguisher"></i>
+                <div class="contact-info">
+                    <div class="contact-name">Bombeiros</div>
+                    <div class="contact-number">193</div>
+                    <div class="contact-description">Resgate e emergências</div>
+                </div>
+            </a>
+            <a href="tel:190" class="emergency-contact">
+                <i class="fas fa-shield-alt"></i>
+                <div class="contact-info">
+                    <div class="contact-name">Polícia Militar</div>
+                    <div class="contact-number">190</div>
+                    <div class="contact-description">Emergências policiais</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Painel de Acessibilidade -->
+    <div class="accessibility-overlay" id="accessibilityOverlay"></div>
+    <div class="accessibility-panel" id="accessibilityPanel">
+        <button class="close-button" id="closeAccessibility">
+            <i class="fas fa-times"></i>
+        </button>
+        <h3><i class="fas fa-universal-access"></i> Acessibilidade</h3>
+        <div class="accessibility-options">
+            <div class="font-controls">
+                <span>Tamanho da fonte:</span>
+                <button class="font-button" data-size="small">A</button>
+                <button class="font-button active" data-size="medium">A</button>
+                <button class="font-button" data-size="large">A</button>
+                <button class="font-button" data-size="xlarge">A</button>
+            </div>
+            <div class="spacing-controls">
+                <span>Espaçamento do texto:</span>
+                <button class="spacing-button" data-spacing="normal">Normal</button>
+                <button class="spacing-button" data-spacing="large">Amplo</button>
+            </div>
+            <div class="voice-controls">
+                <span>Comandos de voz</span>
+                <label class="switch">
+                    <input type="checkbox" id="voiceToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="dyslexic-toggle">
+                <span>Fonte para dislexia</span>
+                <label class="switch">
+                    <input type="checkbox" id="dyslexicToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div id="confirmationOverlay" class="modal-overlay">
+        <div id="confirmationModal" class="confirmation-modal">
+            <h3><i class="fas fa-plus-circle"></i> Iniciar Nova Sessão</h3>
+            <p>Deseja iniciar uma nova conversa com o chatbot?</p>
+            <div class="confirmation-actions">
+                <button class="confirmation-button cancel-button" id="cancelNewSession">Cancelar</button>
+                <button class="confirmation-button confirm-button" id="confirmNewSession">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Configuração global
+        window.SERVER_URL = 'http://localhost:3001';
+        
+        // Redireciona para login se acessar diretamente
+        window.onload = function() {
+            const authToken = localStorage.getItem('authToken');
+            const isGuest = localStorage.getItem('guestMode') === 'true';
+            if (!authToken && !isGuest && !window.location.pathname.includes('login.html')) {
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+    <script src="scripts/auth.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
+</html> 
