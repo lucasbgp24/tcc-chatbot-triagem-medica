@@ -667,12 +667,10 @@ ${user.allergies ? `- Alergias: ${user.allergies}` : ''}`;
 });
 
 // Iniciar o servidor
-if (process.env.NODE_ENV !== 'production') {
-    app.listen(PORT, () => {
-        console.log(`\nServidor rodando em http://localhost:${PORT}`);
-        console.log('Pressione Ctrl+C para parar o servidor\n');
-    });
-}
+app.listen(PORT, () => {
+    console.log(`\nServidor rodando em http://localhost:${PORT}`);
+    console.log('Pressione Ctrl+C para parar o servidor\n');
+});
 
 // Exporta o app para o Vercel
 module.exports = app; 
