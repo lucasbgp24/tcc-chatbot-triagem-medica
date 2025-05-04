@@ -66,7 +66,9 @@ function togglePasswordVisibility(button) {
 
 // Adicionar evento para todos os botões de toggle de senha
 document.querySelectorAll('.toggle-password').forEach(button => {
-    button.addEventListener('click', () => togglePasswordVisibility(button));
+    if (button) {
+        button.addEventListener('click', () => togglePasswordVisibility(button));
+    }
 });
 
 // Função para mostrar mensagem de erro
@@ -257,16 +259,24 @@ function closeRegisterModal() {
 }
 
 // Event Listeners
-document.getElementById('showRegister').addEventListener('click', (e) => {
-    e.preventDefault();
-    showRegisterModal();
-});
+const showRegisterBtn = document.getElementById('showRegister');
+if (showRegisterBtn) {
+    showRegisterBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        showRegisterModal();
+    });
+}
 
-document.getElementById('closeRegister').addEventListener('click', closeRegisterModal);
+const closeRegisterBtn = document.getElementById('closeRegister');
+if (closeRegisterBtn) {
+    closeRegisterBtn.addEventListener('click', closeRegisterModal);
+}
 
-// Fechar modal ao clicar fora
-document.getElementById('registerModal').addEventListener('click', (e) => {
-    if (e.target === e.currentTarget) {
-        closeRegisterModal();
-    }
-}); 
+const registerModal = document.getElementById('registerModal');
+if (registerModal) {
+    registerModal.addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) {
+            closeRegisterModal();
+        }
+    });
+} 
