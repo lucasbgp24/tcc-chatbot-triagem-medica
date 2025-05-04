@@ -55,16 +55,19 @@ const loginForm = document.querySelector('.login-form');
 const registerForm = document.getElementById('registerForm');
 const emailInput = document.querySelector('#email');
 const passwordInput = document.querySelector('#password');
-const togglePasswordBtn = document.querySelector('.toggle-password');
 
 // Função para alternar visibilidade da senha
-if (togglePasswordBtn) {
-    togglePasswordBtn.addEventListener('click', () => {
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
-        togglePasswordBtn.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
-    });
+function togglePasswordVisibility(button) {
+    const passwordInput = button.closest('.password-input').querySelector('input');
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+    button.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
 }
+
+// Adicionar evento para todos os botões de toggle de senha
+document.querySelectorAll('.toggle-password').forEach(button => {
+    button.addEventListener('click', () => togglePasswordVisibility(button));
+});
 
 // Função para mostrar mensagem de erro
 function showError(message) {
@@ -84,6 +87,12 @@ function removeError() {
     if (errorDiv) {
         errorDiv.remove();
     }
+}
+
+// Função para validar email
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
 }
 
 // Função para acessar como convidado
@@ -157,9 +166,28 @@ async function handleRegister(event) {
     removeError();
 
     const fullName = document.getElementById('fullName').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
+    const email = document.getElementById('registerEmail').value.trim();
+    const password = document.getElementById('registerPassword').value;
     const birthDate = document.getElementById('birthDate').value;
+    const gender = document.getElementById('gender').value;
+    const medicalConditions = document.getElementById('medicalConditions').value.trim();
+    const allergies = document.getElementById('allergies').value.trim();
+
+    // Validações básicas
+    if (!fullName || !email || !password || !birthDate || !gender) {
+        showError('Por favor, preencha todos os campos obrigatórios');
+        return;
+    }
+
+    if (!validateEmail(email)) {
+        showError('Por favor, insira um email válido');
+        return;
+    }
+
+    if (password.length < 6) {
+        showError('A senha deve ter pelo menos 6 caracteres');
+        return;
+    }
 
     try {
         const response = await fetch(`/api/register`, {
@@ -171,7 +199,10 @@ async function handleRegister(event) {
                 fullName, 
                 email, 
                 password, 
-                birthDate 
+                birthDate,
+                gender,
+                medicalConditions,
+                allergies
             })
         });
 
@@ -181,6 +212,12 @@ async function handleRegister(event) {
             localStorage.setItem('authToken', data.token);
             localStorage.setItem('guestMode', 'false');
             localStorage.setItem('userName', data.user.fullName);
+            
+            // Fechar o modal e limpar o formulário
+            closeRegisterModal();
+            registerForm.reset();
+            
+            // Redirecionar para a página principal
             window.location.href = 'index.html';
         } else {
             showError(data.error || 'Erro ao registrar usuário');
@@ -204,4 +241,32 @@ if (registerForm) {
 const guestAccessBtn = document.querySelector('.guest-access');
 if (guestAccessBtn) {
     guestAccessBtn.addEventListener('click', accessAsGuest);
-} 
+}
+
+// Funções do Modal de Registro
+function showRegisterModal() {
+    const modal = document.getElementById('registerModal');
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeRegisterModal() {
+    const modal = document.getElementById('registerModal');
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Event Listeners
+document.getElementById('showRegister').addEventListener('click', (e) => {
+    e.preventDefault();
+    showRegisterModal();
+});
+
+document.getElementById('closeRegister').addEventListener('click', closeRegisterModal);
+
+// Fechar modal ao clicar fora
+document.getElementById('registerModal').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) {
+        closeRegisterModal();
+    }
+}); 

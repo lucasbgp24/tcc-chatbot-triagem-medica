@@ -10,16 +10,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
-    <div class="container">
+    <div class="login-container">
         <div class="login-card">
             <div class="login-header">
                 <i class="fas fa-user-md"></i>
                 <h1>Sistema de Triagem</h1>
                 <p>Faça login para acessar o sistema</p>
             </div>
-            
+
             <form class="login-form">
-                <div class="input-group">
+                <div class="form-group">
                     <label for="email">
                         <i class="fas fa-envelope"></i>
                         Email
@@ -27,36 +27,130 @@
                     <input type="email" id="email" required>
                 </div>
 
-                <div class="input-group">
+                <div class="form-group">
                     <label for="password">
                         <i class="fas fa-lock"></i>
                         Senha
                     </label>
-                    <input type="password" id="password" required>
-                    <button type="button" class="toggle-password">
-                        <i class="fas fa-eye"></i>
-                    </button>
+                    <div class="password-input">
+                        <input type="password" id="password" required>
+                        <button type="button" class="toggle-password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
 
-                <div class="remember-me">
-                    <input type="checkbox" id="remember">
-                    <label for="remember">Lembrar de mim</label>
+                <div class="form-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="remember">
+                        Lembrar de mim
+                    </label>
                 </div>
 
-                <button type="submit" class="login-button">
+                <button type="submit" class="submit-button">
                     <i class="fas fa-sign-in-alt"></i>
                     Entrar
                 </button>
 
-                <button type="button" class="guest-access" onclick="accessAsGuest()">
-                    <i class="fas fa-user"></i>
+                <button type="button" class="guest-button" onclick="accessAsGuest()">
+                    <i class="fas fa-user-secret"></i>
                     Continuar sem conta
                 </button>
             </form>
 
-            <div class="register-link">
-                Não tem uma conta? <a href="register.html">Registre-se</a>
+            <p class="register-text">
+                Não tem uma conta? <a href="#" id="showRegister">Registre-se</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Modal de Registro -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <button class="close-button" id="closeRegister">&times;</button>
+            <div class="modal-header">
+                <i class="fas fa-user-plus"></i>
+                <h1>Criar Conta</h1>
+                <p>Preencha os dados para se registrar</p>
             </div>
+            
+            <form class="register-form" id="registerForm">
+                <div class="form-group">
+                    <label for="fullName">
+                        <i class="fas fa-user"></i>
+                        Nome Completo
+                    </label>
+                    <input type="text" id="fullName" placeholder="Digite seu nome completo" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="registerEmail">
+                        <i class="fas fa-envelope"></i>
+                        Email
+                    </label>
+                    <input type="email" id="registerEmail" placeholder="Digite seu email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="registerPassword">
+                        <i class="fas fa-lock"></i>
+                        Senha
+                    </label>
+                    <div class="password-input">
+                        <input type="password" id="registerPassword" placeholder="Digite sua senha" required>
+                        <button type="button" class="toggle-password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="birthDate">
+                        <i class="fas fa-calendar"></i>
+                        Data de Nascimento
+                    </label>
+                    <input type="date" id="birthDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="gender">
+                        <i class="fas fa-venus-mars"></i>
+                        Gênero
+                    </label>
+                    <select id="gender" required>
+                        <option value="">Selecione o gênero</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Feminino</option>
+                        <option value="O">Outro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="medicalConditions">
+                        <i class="fas fa-notes-medical"></i>
+                        Condições Médicas
+                    </label>
+                    <textarea id="medicalConditions" placeholder="Liste suas condições médicas (opcional)"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="allergies">
+                        <i class="fas fa-allergies"></i>
+                        Alergias
+                    </label>
+                    <textarea id="allergies" placeholder="Liste suas alergias (opcional)"></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="submit-button">
+                        <i class="fas fa-user-plus"></i>
+                        Registrar
+                    </button>
+                    <button type="button" class="cancel-button" onclick="closeRegisterModal()">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
