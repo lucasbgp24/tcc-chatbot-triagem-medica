@@ -173,6 +173,11 @@ COLETA DE INFORMAÇÕES:
 4. Sintomas associados
 5. Histórico médico relevante
 
+FLUXO DE TRIAGEM:
+- Baixa Gravidade: Sintomas leves, orientação para cuidados em casa.
+- Média Gravidade: Recomendação de consulta não urgente.
+- Alta Gravidade: Encaminhamento imediato para emergência.
+
 IMPORTANTE:
 - Em caso de sintomas graves, oriente buscar atendimento imediato
 - Não faça diagnósticos definitivos
