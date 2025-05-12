@@ -133,3 +133,5 @@ iniciar.bat
 Lucas Oliveira - oliveira.cavalcanti@aluno.ifsp.edu.br
 
 Link do Projeto: https://github.com/lucasbgp24/tcc-chatbot-triagem-medica
+
+Hospedado: https://tcc-chatbot-triagem-medica.vercel.app/login.html
