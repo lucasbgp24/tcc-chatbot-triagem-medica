@@ -1668,7 +1668,7 @@ async function exportToPDF() {
             if (!message.content.trim() || seen.has(key)) continue;
             seen.add(key);
             const cleanedContent = cleanTextForPDF(message.content);
-            const prefix = message.role === 'assistant' ? 'Médico: ' : 'Paciente: ';
+            const prefix = message.role === 'assistant' ? 'Atendente Virtual: ' : 'Paciente: ';
             const text = `${prefix}${cleanedContent}`;
             yPosition = addWrappedText(text, yPosition);
             yPosition += lineHeight;
