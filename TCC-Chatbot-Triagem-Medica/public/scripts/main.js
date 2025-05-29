@@ -1634,7 +1634,7 @@ async function exportToPDF() {
         // Adiciona título
         doc.setFont("helvetica", "bold");
         doc.setFontSize(16);
-        doc.text("Relatório de Atendimento - Triagem Médica", margin, yPosition);
+        doc.text("Relatório de Atendimento - Triagem", margin, yPosition);
         yPosition += lineHeight * 2;
         
         // Adiciona data
