@@ -1,0 +1,13 @@
+Links Importantes
+
+GitHub: https://github.com/lucasbgp24/tcc-chatbot-triagem-medica
+
+Vercel: https://vercel.com/lucas-projects-9c769a33/tcc-chatbot-triagem-medica
+
+MongoDB Atlas: https://cloud.mongodb.com/v2/67fd2dcc8433991897aee710#/security/network/accessList
+
+------
+
+Link hospedado Front=end Vercel: https://tcc-chatbot-triagem-medica.vercel.app/login.html 
+
+Link hospedado Back=end Render: https://tcc-chatbot-triagem-medica.onrender.com/

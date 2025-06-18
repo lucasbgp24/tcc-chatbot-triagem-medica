@@ -1,0 +1,23 @@
+Nome: Lucas Oliveira Cavalcanti de Sousa
+
+Titulo: A NOVA ERA DA INTELIGÊNCIA ARTIFICIAL: DESENVOLVIMENTO DE UM CHATBOT PARA TRIAGEM AUTOMATIZADA DE SINTOMAS
+
+Resumo: O presente trabalho propôs o desenvolvimento de um chatbot para triagem automatizada de 
+sintomas, com base em tecnologias de Inteligência Artificial (IA) e Processamento de 
+Linguagem Natural (PLN). A proposta visa oferecer orientações iniciais aos pacientes, 
+contribuindo para a organização do fluxo de atendimento nos serviços de saúde e 
+potencialmente diminuindo a sobrecarga nas unidades de atendimento. O projeto foi 
+estruturado em etapas que incluíram levantamento bibliográfico, definição de escopo, 
+desenvolvimento técnico e testes de validação. O chatbot foi implementado como uma 
+aplicação web, utilizando tecnologias modernas de frontend e backend, integradas à API da 
+OpenAI. O sistema permite simular triagens com base nos relatos dos usuários, oferecendo 
+respostas ajustadas ao nível percebido de gravidade dos sintomas. Os testes realizados com 
+casos simulados demonstraram qualidade nas recomendações, usabilidade adequada e 
+desempenho técnico satisfatório. O estudo também discute aspectos éticos, como a 
+privacidade de dados e os riscos da dependência tecnológica. Conclui-se que o chatbot 
+desenvolvido pode contribuir para o aprimoramento da triagem inicial e promover um 
+atendimento mais eficiente e acessível.
+
+Orientador: José Américo dos Santos Mendonça
+
+Mês/Ano: 06/2025
